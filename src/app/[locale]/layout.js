@@ -16,12 +16,6 @@ import BackgroundGradient from "@/components/BackgroundGradient";
 
 const rubik = Rubik({ subsets: ["latin", "latin-ext"] });
 
-export const metadata = {
-    title: "Nekos.Land - UwU-nique Adventures with +29.4k Anime Image Meowsterpieces!",
-    description:
-        "Explore +29.4k adorable anime images in Nekos.Land, where charming meows and purrfection await! Join our Discord server for a meow-tastic community of anime enthusiasts. Embrace the kawaii wonders and unleash your love for anime!",
-};
-
 export function generateStaticParams() {
     return [{ locale: "en" }, { locale: "es" }];
 }
@@ -36,6 +30,10 @@ export default async function RootLayout({ children, params: { locale } }) {
 
     return (
         <html lang={locale}>
+            <head>
+                <title>Nekos.Land - UwU-nique Adventures with +29.4k Anime Image Meowsterpieces!</title>
+                <meta name="og:description">Explore +29.4k adorable anime images in Nekos.Land, where charming meows and purrfection await! Join our Discord server for a meow-tastic community of anime enthusiasts. Embrace the kawaii wonders and unleash your love for anime!</meta>
+            </head>
             <body className={rubik.className}>
                 <SessionProvider>
                     <NextIntlClientProvider locale={locale} messages={messages}>
