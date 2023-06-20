@@ -1,0 +1,14 @@
+{
+    "NavigationBar": {
+        "home": "Inicio",
+        "gallery": "Galería",
+        "about": "Acerca De",
+        "log_in": "Iniciar Sesión",
+        "log_out": "Cerrar Sesión"
+    },
+    "Home": {
+        "refresh": "Otra imagen!",
+        "share": "Compartir",
+        "copied": "La URL de la imagen ha sido copiada en tu portapapeles!"
+    }
+}

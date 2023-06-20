@@ -9,10 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroicons/react": "^2.0.18",
     "autoprefixer": "10.4.14",
     "eslint": "8.42.0",
     "eslint-config-next": "13.4.5",
+    "framer-motion": "^10.12.16",
     "next": "13.4.5",
+    "next-auth": "^4.22.1",
+    "next-intl": "^2.14.6",
     "postcss": "8.4.24",
     "react": "18.2.0",
     "react-dom": "18.2.0",

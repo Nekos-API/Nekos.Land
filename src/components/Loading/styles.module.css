@@ -1,0 +1,19 @@
+@tailwind components;
+
+@keyframes loading {
+    0% {
+        transform: translateX(-36px);
+    }
+    50% {
+        transform: translateX(36px);
+    }
+    100% {
+        transform: translateX(-36px);
+    }
+}
+
+@layer {
+    .loading {
+        animation: loading 2s ease-in-out infinite;
+    }
+}

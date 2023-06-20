@@ -1,0 +1,7 @@
+@tailwind components;
+
+@layer components {
+    .navLink {
+        @apply text-xl font-medium px-4 py-2 -m-2 leading-none rounded-lg hover:bg-neutral-800 hover:scale-95 transition-all;
+    }
+}

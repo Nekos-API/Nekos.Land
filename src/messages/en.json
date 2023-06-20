@@ -1,0 +1,14 @@
+{
+    "NavigationBar": {
+        "home": "Home",
+        "gallery": "Gallery",
+        "about": "About",
+        "log_in": "Log In",
+        "log_out": "Log Out"
+    },
+    "Home": {
+        "refresh": "Another image!",
+        "share": "Share",
+        "copied": "Image URL copied to clipboard!"
+    }
+}
