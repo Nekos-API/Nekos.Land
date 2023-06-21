@@ -9,6 +9,12 @@
     "Home": {
         "refresh": "Otra imagen!",
         "share": "Compartir",
-        "copied": "La URL de la imagen ha sido copiada en tu portapapeles!"
+        "copied": "La URL de la imagen ha sido copiada en tu portapapeles!",
+        "filter": "Filtrar",
+        "sfw": "Apto para todo público",
+        "questionable": "Cuestionable",
+        "suggestive": "Sugestivo",
+        "borderline": "Al límite",
+        "explicit": "Explícito (+18)"
     }
 }

@@ -2,7 +2,12 @@
 
 import React from "react";
 
-import { ArrowPathIcon, ShareIcon } from "@heroicons/react/24/outline";
+import {
+    ArrowPathIcon,
+    CheckIcon,
+    ChevronUpIcon,
+    ShareIcon,
+} from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
 
@@ -51,8 +56,17 @@ function darkenHexColor(hexColor, percentage) {
     return `#${darkenedHex}`;
 }
 
+const FiltersContext = React.createContext({
+    ageRatingIn: [],
+    setAgeRatingIn: (v) => {},
+});
+
 export default function Home() {
     const { setBgGradient } = React.useContext(ThemeContext);
+    const [ageRatingIn, setAgeRatingIn] = React.useState([
+        "sfw",
+        "questionable",
+    ]);
 
     const [data, setData] = React.useState({});
     const [isLoading, setIsLoading] = React.useState(true);
@@ -66,7 +80,7 @@ export default function Home() {
         setIsImageLoading(true);
         setError(false);
 
-        fetch("https://api.nekosapi.com/v2/images/random", {
+        fetch(`https://api.nekosapi.com/v2/images/random?filter[ageRating.in]=${encodeURIComponent(ageRatingIn.join(","))}`, {
             headers: {
                 Accept: "application/vnd.api+json",
             },
@@ -95,55 +109,180 @@ export default function Home() {
 
     return (
         <main className="flex-1 flex flex-col items-center justify-center py-8">
-            <motion.div
-                className="max-w-sm min-h-[24rem] w-full rounded bg-neutral-900 flex flex-col items-center justify-center overflow-hidden"
-                animate={{ height: isImageLoading ? 384 : "auto" }}
-                transition={{ ease: "easeInOut", duration: 0.3 }}
-            >
-                <AnimatePresence>
-                    {(isLoading || isImageLoading) && (
-                        <div
-                            className="flex flex-col items-center justify-center gap-2 absolute"
-                            key={1}
-                        >
-                            <CatIcon className="h-8 w-8 text-neutral-600" />
-                            <Loading />
-                        </div>
-                    )}
-                    <img
-                        src={!isLoading && !error ? data.attributes.file : null}
-                        className="w-full max-w-sm rounded object-cover object-center bg-neutral-900 transition-all duration-300"
-                        style={{
-                            opacity: !isLoading && !error ? 1 : 384,
-                        }}
-                        onLoad={() => {
-                            setIsImageLoading(false);
-                        }}
-                    />
-                </AnimatePresence>
-            </motion.div>
-            <div className="mt-8 flex flex-row items-center gap-4">
-                <button
-                    className="flex flex-row gap-2 py-2 px-4 items-center justify-center rounded-full bg-neutral-900 hover:scale-95 transition-all"
-                    onClick={refreshImage}
+            <FiltersContext.Provider value={{ ageRatingIn, setAgeRatingIn }}>
+                <motion.div
+                    className="max-w-sm w-full rounded bg-neutral-900 flex flex-col items-center justify-center overflow-hidden"
+                    animate={{ height: isImageLoading ? "24rem" : "auto" }}
+                    style={{ minHeight: isImageLoading ? "24rem" : "auto" }}
+                    transition={{ ease: "easeInOut", duration: 0.3 }}
                 >
-                    <ArrowPathIcon
-                        className={`w-5 h-5 ${
-                            isLoading || isImageLoading ? "animate-spin" : ""
-                        }`}
-                    />
-                    {t("refresh")}
-                </button>
-                <button
-                    className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 hover:scale-90 transition-all"
-                    onClick={() => {
-                        navigator.clipboard.writeText(data.attributes.file);
-                        alert(t("copied"));
-                    }}
-                >
-                    <ShareIcon className="w-5 h-5" />
-                </button>
-            </div>
+                    <AnimatePresence>
+                        {(isLoading || isImageLoading) && (
+                            <div
+                                className="flex flex-col items-center justify-center gap-2 absolute"
+                                key={1}
+                            >
+                                <CatIcon className="h-8 w-8 text-neutral-600" />
+                                <Loading />
+                            </div>
+                        )}
+                        <img
+                            src={
+                                !isLoading && !error
+                                    ? data.attributes.file
+                                    : null
+                            }
+                            className="w-full max-w-sm rounded object-cover object-center bg-neutral-900 transition-all duration-300"
+                            style={{
+                                opacity: !isLoading && !error ? 1 : 384,
+                            }}
+                            onLoad={() => {
+                                setIsImageLoading(false);
+                            }}
+                        />
+                    </AnimatePresence>
+                </motion.div>
+                <div className="mt-8 flex flex-row items-center gap-4">
+                    <button
+                        className="flex flex-row gap-2 py-2 px-4 items-center justify-center rounded-full bg-neutral-900 hover:scale-95 transition-all"
+                        onClick={refreshImage}
+                    >
+                        <ArrowPathIcon
+                            className={`w-5 h-5 ${
+                                isLoading || isImageLoading
+                                    ? "animate-spin"
+                                    : ""
+                            }`}
+                        />
+                        {t("refresh")}
+                    </button>
+                    <button
+                        className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 hover:scale-90 transition-all"
+                        onClick={() => {
+                            navigator.clipboard.writeText(data.attributes.file);
+                            alert(t("copied"));
+                        }}
+                    >
+                        <ShareIcon className="w-5 h-5" />
+                    </button>
+                </div>
+                <FiltersPanel />
+            </FiltersContext.Provider>
         </main>
+    );
+}
+
+function FiltersPanel() {
+    const t = useTranslations("Home");
+
+    const [isOpen, setIsOpen] = React.useState(false);
+
+    const { ageRatingIn, setAgeRatingIn } = React.useContext(FiltersContext);
+
+    function AgeRatingCheckboxToggleHandler({ children, ageRating }) {
+        return (
+            <div
+                onClick={() => {
+                    if (!ageRatingIn.includes(ageRating)) {
+                        setAgeRatingIn((v) => [...v, ageRating]);
+                    } else {
+                        setAgeRatingIn((v) =>
+                            v.filter((rating) => rating !== ageRating)
+                        );
+                    }
+                }}
+            >
+                {children}
+            </div>
+        );
+    }
+
+    return (
+        <div className="fixed bottom-0 right-12 rounded-t bg-neutral-900 w-60">
+            <div
+                className="flex flex-row items-center justify-between leading-none p-4 cursor-pointer"
+                onClick={() => setIsOpen(!isOpen)}
+            >
+                <span className="font-medium">{t("filter")}</span>
+                <ChevronUpIcon
+                    className="w-5 h-5 stroke-2 transition-transform"
+                    style={{
+                        transform: isOpen ? "rotate(180deg)" : "rotate(0)",
+                    }}
+                />
+            </div>
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        className="p-4 overflow-y-auto border-t border-t-neutral-800"
+                        initial={{ height: 0 }}
+                        animate={{ height: "auto" }}
+                        exit={{ height: 0 }}
+                        transition={{ ease: "easeInOut", duration: 0.3 }}
+                    >
+                        <div className="flex flex-col gap-2">
+                            <AgeRatingCheckboxToggleHandler ageRating="sfw">
+                                <Checkbox
+                                    isChecked={ageRatingIn.includes("sfw")}
+                                    label={t("sfw")}
+                                />
+                            </AgeRatingCheckboxToggleHandler>
+                            <AgeRatingCheckboxToggleHandler ageRating="questionable">
+                                <Checkbox
+                                    isChecked={ageRatingIn.includes(
+                                        "questionable"
+                                    )}
+                                    label={t("questionable")}
+                                />
+                            </AgeRatingCheckboxToggleHandler>
+                            <AgeRatingCheckboxToggleHandler ageRating="suggestive">
+                                <Checkbox
+                                    isChecked={ageRatingIn.includes(
+                                        "suggestive"
+                                    )}
+                                    label={t("suggestive")}
+                                />
+                            </AgeRatingCheckboxToggleHandler>
+                            <AgeRatingCheckboxToggleHandler ageRating="borderline">
+                                <Checkbox
+                                    isChecked={ageRatingIn.includes(
+                                        "borderline"
+                                    )}
+                                    label={t("borderline")}
+                                />
+                            </AgeRatingCheckboxToggleHandler>
+                            <AgeRatingCheckboxToggleHandler ageRating="explicit">
+                                <Checkbox
+                                    isChecked={ageRatingIn.includes("explicit")}
+                                    label={t("explicit")}
+                                />
+                            </AgeRatingCheckboxToggleHandler>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
+
+function Checkbox({ isChecked, label }) {
+    return (
+        <div className="flex flex-row items-center gap-2 cursor-pointer transition-opacity hover:opacity-80">
+            <button
+                className="border-2 border-white rounded-sm h-4 w-4 transition-color"
+                style={{
+                    backgroundColor: isChecked ? "white" : "transparent",
+                }}
+            >
+                <CheckIcon
+                    className="w-3 h-3 transition-colors"
+                    style={{
+                        color: isChecked ? "black" : "transparent",
+                        strokeWidth: "4px",
+                    }}
+                />
+            </button>
+            <span className="text-sm">{label}</span>
+        </div>
     );
 }

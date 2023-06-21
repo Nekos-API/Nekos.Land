@@ -9,6 +9,12 @@
     "Home": {
         "refresh": "Another image!",
         "share": "Share",
-        "copied": "Image URL copied to clipboard!"
+        "copied": "Image URL copied to clipboard!",
+        "filter": "Filter",
+        "sfw": "Safe for work",
+        "questionable": "Questionable",
+        "suggestive": "Suggestive",
+        "borderline": "Borderline",
+        "explicit": "Explicit (+18)"
     }
 }
