@@ -15,6 +15,8 @@
         "questionable": "Questionable",
         "suggestive": "Suggestive",
         "borderline": "Borderline",
-        "explicit": "Explicit (+18)"
+        "explicit": "Explicit (+18)",
+        "website": "Website",
+        "links": "Links"
     }
 }

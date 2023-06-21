@@ -45,7 +45,7 @@ export default function NavigationBar() {
             backgroundColor: isMobileNavOpen ? "transparent" : navBackground
         }}>
             <div className="flex-1 flex flex-row items-center gap-0.5">
-                <button className="md:hidden p-2.5 rounded-full hover:bg-white/10 transition-all relative" onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}>
+                <button className="md:hidden p-2.5 -ml-2.5 -my-2.5 rounded-full hover:bg-white/10 transition-all relative" onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}>
                     <Bars3Icon className="h-6 w-6 transition-all" style={{
                         opacity: isMobileNavOpen ? 0 : 1
                     }} />
@@ -71,20 +71,20 @@ export default function NavigationBar() {
             {isMobileNavOpen && (
                 <motion.div
                     key="sidebar"
-                    className="w-screen h-screen fixed top-0 bottom-0 left-0 right-0 pt-[4.75rem] bg-neutral-900 rounded-l z-10"
+                    className="w-screen h-screen fixed top-0 bottom-0 left-0 right-0 pt-16 bg-neutral-900 rounded-l z-10"
                     initial={{ x: "-100vw" }}
                     animate={{ x: 0 }}
                     exit={{ x: "100vw" }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}>
                     <div className="py-4">
-                        <span className="block text-xs font-semibold text-rose-400 pl-[1.625rem] leading-none my-2">Website</span>
+                        <span className="block text-xs font-semibold text-rose-400 pl-4 leading-none my-2">{t("website")}</span>
                         <MobileNavLink icon={(<HomeIcon />)} label={t("home")} href="/" />
                         <MobileNavLink icon={(<Squares2X2Icon />)} label={t("gallery")} href="/gallery" />
                         <MobileNavLink icon={(<QuestionMarkCircleIcon />)} label={t("about")} href="/about" />
 
-                        <span className="block text-xs font-semibold text-rose-400 pl-[1.625rem] leading-none mb-2 mt-6">Links</span>
-                        <MobileNavLink icon={(<DiscordIcon className="h-6 w-6" />)} label="Discord" href="https://discord.com/invite/PgQnuM3YnM" />
-                        <MobileNavLink icon={(<GithubIcon className="h-6 w-6" />)} label="GitHub" href="https://github.com/Nekos-API/Nekos-Land" />
+                        <span className="block text-xs font-semibold text-rose-400 pl-4 leading-none mb-2 mt-6">{t("links")}</span>
+                        <MobileNavLink icon={(<DiscordIcon className="h-5 w-5" />)} label="Discord" href="https://discord.com/invite/PgQnuM3YnM" />
+                        <MobileNavLink icon={(<GithubIcon className="h-5 w-5" />)} label="GitHub" href="https://github.com/Nekos-API/Nekos-Land" />
                     </div>
                 </motion.div>
             )}
@@ -154,8 +154,8 @@ function LoginButton() {
 
 function MobileNavLink({ icon, label, href }) {
     return (
-        <Link href={href} className="px-[1.625rem] py-2 flex flex-row items-center gap-4 transition-colors hover:bg-neutral-800">
-            <div className="h-6 w-6 flex flex-col justify-center">{icon}</div>
+        <Link href={href} className="px-4 py-2 flex flex-row items-center gap-4 transition-colors hover:bg-neutral-800 hover:text-rose-200">
+            <div className="h-6 w-6 flex flex-col items-center justify-center">{icon}</div>
             <div>{label}</div>
         </Link>
     )
