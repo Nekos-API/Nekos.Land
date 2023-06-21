@@ -4,7 +4,9 @@
         "gallery": "Galería",
         "about": "Acerca De",
         "log_in": "Iniciar Sesión",
-        "log_out": "Cerrar Sesión"
+        "log_out": "Cerrar Sesión",
+        "website": "Sitio web",
+        "links": "Links"
     },
     "Home": {
         "refresh": "Otra imagen!",
@@ -15,8 +17,6 @@
         "questionable": "Cuestionable",
         "suggestive": "Sugestivo",
         "borderline": "Al límite",
-        "explicit": "Explícito (+18)",
-        "website": "Sitio web",
-        "links": "Links"
+        "explicit": "Explícito (+18)"
     }
 }

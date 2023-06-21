@@ -4,7 +4,9 @@
         "gallery": "Gallery",
         "about": "About",
         "log_in": "Log In",
-        "log_out": "Log Out"
+        "log_out": "Log Out",
+        "website": "Website",
+        "links": "Links"
     },
     "Home": {
         "refresh": "Another image!",
@@ -15,8 +17,6 @@
         "questionable": "Questionable",
         "suggestive": "Suggestive",
         "borderline": "Borderline",
-        "explicit": "Explicit (+18)",
-        "website": "Website",
-        "links": "Links"
+        "explicit": "Explicit (+18)"
     }
 }
