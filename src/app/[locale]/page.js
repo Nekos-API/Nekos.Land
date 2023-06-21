@@ -80,11 +80,16 @@ export default function Home() {
         setIsImageLoading(true);
         setError(false);
 
-        fetch(`https://api.nekosapi.com/v2/images/random?filter[ageRating.in]=${encodeURIComponent(ageRatingIn.join(","))}`, {
-            headers: {
-                Accept: "application/vnd.api+json",
-            },
-        })
+        fetch(
+            `https://api.nekosapi.com/v2/images/random?filter[ageRating.in]=${encodeURIComponent(
+                ageRatingIn.join(",")
+            )}`,
+            {
+                headers: {
+                    Accept: "application/vnd.api+json",
+                },
+            }
+        )
             .then((res) => res.json())
             .then((res) => {
                 setData(res.data);
@@ -108,63 +113,67 @@ export default function Home() {
     }, []);
 
     return (
-        <main className="flex-1 flex flex-col items-center justify-center py-8">
+        <main className="flex-1 flex flex-col">
             <FiltersContext.Provider value={{ ageRatingIn, setAgeRatingIn }}>
-                <motion.div
-                    className="max-w-sm w-full rounded bg-neutral-900 flex flex-col items-center justify-center overflow-hidden"
-                    animate={{ height: isImageLoading ? "24rem" : "auto" }}
-                    style={{ minHeight: isImageLoading ? "24rem" : "auto" }}
-                    transition={{ ease: "easeInOut", duration: 0.3 }}
-                >
-                    <AnimatePresence>
-                        {(isLoading || isImageLoading) && (
-                            <div
-                                className="flex flex-col items-center justify-center gap-2 absolute"
-                                key={1}
-                            >
-                                <CatIcon className="h-8 w-8 text-neutral-600" />
-                                <Loading />
-                            </div>
-                        )}
-                        <img
-                            src={
-                                !isLoading && !error
-                                    ? data.attributes.file
-                                    : null
-                            }
-                            className="w-full max-w-sm rounded object-cover object-center bg-neutral-900 transition-all duration-300"
-                            style={{
-                                opacity: !isLoading && !error ? 1 : 384,
-                            }}
-                            onLoad={() => {
-                                setIsImageLoading(false);
-                            }}
-                        />
-                    </AnimatePresence>
-                </motion.div>
-                <div className="mt-8 flex flex-row items-center gap-4">
-                    <button
-                        className="flex flex-row gap-2 py-2 px-4 items-center justify-center rounded-full bg-neutral-900 hover:scale-95 transition-all"
-                        onClick={refreshImage}
+                <div className="flex-1 flex flex-col items-center justify-center py-8 px-4">
+                    <motion.div
+                        className="max-w-sm w-full rounded bg-neutral-900 flex flex-col items-center justify-center overflow-hidden"
+                        animate={{ height: isImageLoading ? "24rem" : "auto" }}
+                        style={{ minHeight: isImageLoading ? "24rem" : "auto" }}
+                        transition={{ ease: "easeInOut", duration: 0.3 }}
                     >
-                        <ArrowPathIcon
-                            className={`w-5 h-5 ${
-                                isLoading || isImageLoading
-                                    ? "animate-spin"
-                                    : ""
-                            }`}
-                        />
-                        {t("refresh")}
-                    </button>
-                    <button
-                        className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 hover:scale-90 transition-all"
-                        onClick={() => {
-                            navigator.clipboard.writeText(data.attributes.file);
-                            alert(t("copied"));
-                        }}
-                    >
-                        <ShareIcon className="w-5 h-5" />
-                    </button>
+                        <AnimatePresence>
+                            {(isLoading || isImageLoading) && (
+                                <div
+                                    className="flex flex-col items-center justify-center gap-2 absolute"
+                                    key={1}
+                                >
+                                    <CatIcon className="h-8 w-8 text-neutral-600" />
+                                    <Loading />
+                                </div>
+                            )}
+                            <img
+                                src={
+                                    !isLoading && !error
+                                        ? data.attributes.file
+                                        : null
+                                }
+                                className="w-full max-w-sm rounded object-cover object-center bg-neutral-900 transition-all duration-300"
+                                style={{
+                                    opacity: !isLoading && !error ? 1 : 384,
+                                }}
+                                onLoad={() => {
+                                    setIsImageLoading(false);
+                                }}
+                            />
+                        </AnimatePresence>
+                    </motion.div>
+                    <div className="mt-8 flex flex-row items-center gap-4">
+                        <button
+                            className="flex flex-row gap-2 py-2 px-4 items-center justify-center rounded-full bg-neutral-900 hover:scale-95 transition-all"
+                            onClick={refreshImage}
+                        >
+                            <ArrowPathIcon
+                                className={`w-5 h-5 ${
+                                    isLoading || isImageLoading
+                                        ? "animate-spin"
+                                        : ""
+                                }`}
+                            />
+                            {t("refresh")}
+                        </button>
+                        <button
+                            className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 hover:scale-90 transition-all"
+                            onClick={() => {
+                                navigator.clipboard.writeText(
+                                    data.attributes.file
+                                );
+                                alert(t("copied"));
+                            }}
+                        >
+                            <ShareIcon className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
                 <FiltersPanel />
             </FiltersContext.Provider>
@@ -198,7 +207,7 @@ function FiltersPanel() {
     }
 
     return (
-        <div className="fixed bottom-0 right-12 rounded-t bg-neutral-900 w-60">
+        <div className="sticky sm:fixed bottom-0 left-0 sm:left-auto right-0 lg:right-12 rounded-t sm:rounded-tl lg:rounded-t bg-neutral-900 sm:w-60 drop-shadow-lg">
             <div
                 className="flex flex-row items-center justify-between leading-none p-4 cursor-pointer"
                 onClick={() => setIsOpen(!isOpen)}
@@ -267,7 +276,7 @@ function FiltersPanel() {
 
 function Checkbox({ isChecked, label }) {
     return (
-        <div className="flex flex-row items-center gap-2 cursor-pointer transition-opacity hover:opacity-80">
+        <div className="flex flex-row items-center gap-2 cursor-pointer transition-opacity hover:opacity-80 select-none">
             <button
                 className="border-2 border-white rounded-sm h-4 w-4 transition-color"
                 style={{
