@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -29,6 +29,9 @@ dependencies:
   next-intl:
     specifier: ^2.15.1
     version: 2.15.1(next@13.4.6)(react@18.2.0)
+  next-nprogress-bar:
+    specifier: ^1.2.5
+    version: 1.2.5
   postcss:
     specifier: 8.4.24
     version: 8.4.24
@@ -1929,6 +1932,12 @@ packages:
       use-intl: 2.15.1(react@18.2.0)
     dev: false
 
+  /next-nprogress-bar@1.2.5:
+    resolution: {integrity: sha512-4RWXRss28QS7/lRgrMZqUxDJdgAuWR2KL13dBOBaHyxiFUaNXjWRNZbJDkMa/5NCHSadsQD/49bHpSfjGlTVcQ==}
+    dependencies:
+      nprogress: 0.2.0
+    dev: false
+
   /next@13.4.6(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-sjVqjxU+U2aXZnYt4Ud6CTLNNwWjdSfMgemGpIQJcN3Z7Jni9xRWbR0ie5fQzCg87aLqQVhKA2ud2gPoqJ9lGw==}
     engines: {node: '>=16.8.0'}
@@ -1998,6 +2007,10 @@ packages:
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dependencies:
       path-key: 4.0.0
+    dev: false
+
+  /nprogress@0.2.0:
+    resolution: {integrity: sha512-I19aIingLgR1fmhftnbWWO3dXc0hSxqHQHQb3H8m+K3TnEn/iSeTZZOyvKXWqQESMwuUVnatlCnZdLBZZt2VSA==}
     dev: false
 
   /oauth@0.9.15:

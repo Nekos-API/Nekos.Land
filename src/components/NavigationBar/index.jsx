@@ -41,30 +41,32 @@ export default function NavigationBar() {
     }, []);
 
     return (<NavbarContext.Provider value={{ isMobileNavOpen, setIsMobileNavOpen }}>
-        <div className={`sticky top-0 left-0 right-0 flex flex-row items-center p-4 transition-all duration-300 z-20 ${isMobileNavOpen ? "border-b border-b-neutral-800" : "border-b-transparent"}`} style={{
+        <div className={`sticky top-0 left-0 right-0 flex flex-row items-center justify-center p-4 transition-all duration-300 z-20 ${isMobileNavOpen ? "border-b border-b-neutral-800" : "border-b-transparent"}`} style={{
             backgroundColor: isMobileNavOpen ? "transparent" : navBackground
         }}>
-            <div className="flex-1 flex flex-row items-center gap-0.5">
-                <button className="md:hidden p-2.5 -ml-2.5 -my-2.5 rounded-full hover:bg-white/10 transition-all relative" onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}>
-                    <Bars3Icon className="h-6 w-6 transition-all" style={{
-                        opacity: isMobileNavOpen ? 0 : 1
-                    }} />
-                    <XMarkIcon className="h-6 w-6 transition-all absolute top-0 bottom-0 my-auto" style={{
-                        opacity: isMobileNavOpen ? 1 : 0
-                    }} />
-                </button>
-                <div className="flex flex-row items-center gap-2">
-                    <div className="text-rose-400"><CatIcon className="h-8 w-8" /></div>
-                    <div className="hidden sm:block font-medium text-2xl">Nekos.Land</div>
+            <div className="flex-1 flex flex-row items-center max-w-7xl">
+                <div className="flex-1 flex flex-row items-center gap-0.5">
+                    <button className="md:hidden p-2.5 -ml-2.5 -my-2.5 rounded-full hover:bg-white/10 transition-all relative" onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}>
+                        <Bars3Icon className="h-6 w-6 transition-all" style={{
+                            opacity: isMobileNavOpen ? 0 : 1
+                        }} />
+                        <XMarkIcon className="h-6 w-6 transition-all absolute top-0 bottom-0 my-auto" style={{
+                            opacity: isMobileNavOpen ? 1 : 0
+                        }} />
+                    </button>
+                    <div className="flex flex-row items-center gap-2">
+                        <div className="text-rose-400"><CatIcon className="h-8 w-8" /></div>
+                        <div className="hidden sm:block font-medium text-2xl">Nekos.Land</div>
+                    </div>
                 </div>
-            </div>
-            <div className="flex-1 hidden md:flex flex-row items-center justify-center gap-8 whitespace-nowrap">
-                <Link href="/" className={styles.navLink + (pathname == "/" ? " " + styles.selected : "")}>{t("home")}</Link>
-                <Link href="/gallery" className={styles.navLink}>{t("gallery")}</Link>
-                <Link href="/about" className={styles.navLink}>{t("about")}</Link>
-            </div>
-            <div className="flex-1 flex flex-row items-center justify-end">
-                {session ? <ProfileButton /> : <LoginButton />}
+                <div className="flex-1 hidden md:flex flex-row items-center justify-center gap-8 whitespace-nowrap">
+                    <Link href="/" className={styles.navLink + (pathname == "/" ? " " + styles.selected : "")}>{t("home")}</Link>
+                    <Link href="/gallery" className={styles.navLink}>{t("gallery")}</Link>
+                    <Link href="/about" className={styles.navLink}>{t("about")}</Link>
+                </div>
+                <div className="flex-1 flex flex-row gap-8 items-center justify-end">
+                    {session ? <ProfileButton /> : <LoginButton />}
+                </div>
             </div>
         </div>
         <AnimatePresence>

@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 @layer base {
+    html {
+        @apply scroll-smooth;
+    }
     body {
         @apply bg-black text-neutral-100 min-h-screen flex flex-col;
     }
