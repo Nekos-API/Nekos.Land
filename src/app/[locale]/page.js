@@ -455,7 +455,7 @@ function FiltersPanel() {
     }
 
     return (
-        <div className="sticky sm:fixed bottom-0 left-0 sm:left-auto right-0 lg:right-12 rounded-t sm:rounded-tl lg:rounded-t bg-neutral-900 sm:w-60 drop-shadow-lg">
+        <div className="fixed sm:fixed bottom-0 left-0 sm:left-auto right-0 lg:right-12 rounded-t sm:rounded-tl lg:rounded-t bg-neutral-900 sm:w-60 drop-shadow-lg">
             <div
                 className="flex flex-row items-center justify-between leading-none p-4 cursor-pointer"
                 onClick={() => setIsOpen(!isOpen)}
