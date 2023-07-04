@@ -455,72 +455,98 @@ function FiltersPanel() {
     }
 
     return (
-        <div className="fixed sm:fixed bottom-0 left-0 sm:left-auto right-0 lg:right-12 rounded-t sm:rounded-tl lg:rounded-t bg-neutral-900 sm:w-60 drop-shadow-lg">
-            <div
-                className="flex flex-row items-center justify-between leading-none p-4 cursor-pointer"
-                onClick={() => setIsOpen(!isOpen)}
-            >
-                <span className="font-medium">{t("filter")}</span>
-                <ChevronUpIcon
-                    className="w-5 h-5 stroke-2 transition-transform"
-                    style={{
-                        transform: isOpen ? "rotate(180deg)" : "rotate(0)",
-                    }}
-                />
-            </div>
+        <div>
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        className="p-4 overflow-hidden border-t border-t-neutral-800"
-                        initial={{ height: 0 }}
-                        animate={{ height: "auto" }}
-                        exit={{ height: 0 }}
+                        key="bg"
+                        className="fixed md:hidden top-0 bottom-0 left-0 right-0 bg-black/50"
+                        initial={{
+                            opacity: 0,
+                        }}
+                        animate={{
+                            opacity: 1,
+                        }}
+                        exit={{
+                            opacity: 0,
+                        }}
                         transition={{ duration: 0.3 }}
-                    >
-                        <div className="flex flex-col gap-2">
-                            <span className="text-xs font-semibold text-rose-400 leading-none mb-2 block">
-                                {t("age_rating")}
-                            </span>
-                            <AgeRatingCheckboxToggleHandler ageRating="sfw">
-                                <Checkbox
-                                    isChecked={ageRatingIn.includes("sfw")}
-                                    label={t("sfw")}
-                                />
-                            </AgeRatingCheckboxToggleHandler>
-                            <AgeRatingCheckboxToggleHandler ageRating="questionable">
-                                <Checkbox
-                                    isChecked={ageRatingIn.includes(
-                                        "questionable"
-                                    )}
-                                    label={t("questionable")}
-                                />
-                            </AgeRatingCheckboxToggleHandler>
-                            <AgeRatingCheckboxToggleHandler ageRating="suggestive">
-                                <Checkbox
-                                    isChecked={ageRatingIn.includes(
-                                        "suggestive"
-                                    )}
-                                    label={t("suggestive")}
-                                />
-                            </AgeRatingCheckboxToggleHandler>
-                            <AgeRatingCheckboxToggleHandler ageRating="borderline">
-                                <Checkbox
-                                    isChecked={ageRatingIn.includes(
-                                        "borderline"
-                                    )}
-                                    label={t("borderline")}
-                                />
-                            </AgeRatingCheckboxToggleHandler>
-                            <AgeRatingCheckboxToggleHandler ageRating="explicit">
-                                <Checkbox
-                                    isChecked={ageRatingIn.includes("explicit")}
-                                    label={t("explicit")}
-                                />
-                            </AgeRatingCheckboxToggleHandler>
-                        </div>
-                    </motion.div>
+                        onClick={() => {
+                            setIsOpen(false);
+                        }}
+                    ></motion.div>
                 )}
             </AnimatePresence>
+            <div className="fixed sm:fixed bottom-0 left-0 sm:left-auto right-0 lg:right-12 rounded-t sm:rounded-tl lg:rounded-t bg-neutral-900 sm:w-60">
+                <div
+                    className="flex flex-row items-center justify-between leading-none p-4 cursor-pointer shadow-xl"
+                    onClick={() => setIsOpen(!isOpen)}
+                >
+                    <span className="font-medium">{t("filter")}</span>
+                    <ChevronUpIcon
+                        className="w-5 h-5 stroke-2 transition-transform duration-300"
+                        style={{
+                            transform: isOpen ? "rotate(180deg)" : "rotate(0)",
+                        }}
+                    />
+                </div>
+                <AnimatePresence>
+                    {isOpen && (
+                        <motion.div
+                            className="p-4 overflow-hidden border-t border-t-neutral-800"
+                            initial={{ height: 0 }}
+                            animate={{ height: "auto" }}
+                            exit={{ height: 0 }}
+                            transition={{ duration: 0.3 }}
+                            key="filters"
+                        >
+                            <div className="flex flex-col gap-2">
+                                <span className="text-xs font-semibold text-rose-400 leading-none mb-2 block">
+                                    {t("age_rating")}
+                                </span>
+                                <AgeRatingCheckboxToggleHandler ageRating="sfw">
+                                    <Checkbox
+                                        isChecked={ageRatingIn.includes("sfw")}
+                                        label={t("sfw")}
+                                    />
+                                </AgeRatingCheckboxToggleHandler>
+                                <AgeRatingCheckboxToggleHandler ageRating="questionable">
+                                    <Checkbox
+                                        isChecked={ageRatingIn.includes(
+                                            "questionable"
+                                        )}
+                                        label={t("questionable")}
+                                    />
+                                </AgeRatingCheckboxToggleHandler>
+                                <AgeRatingCheckboxToggleHandler ageRating="suggestive">
+                                    <Checkbox
+                                        isChecked={ageRatingIn.includes(
+                                            "suggestive"
+                                        )}
+                                        label={t("suggestive")}
+                                    />
+                                </AgeRatingCheckboxToggleHandler>
+                                <AgeRatingCheckboxToggleHandler ageRating="borderline">
+                                    <Checkbox
+                                        isChecked={ageRatingIn.includes(
+                                            "borderline"
+                                        )}
+                                        label={t("borderline")}
+                                    />
+                                </AgeRatingCheckboxToggleHandler>
+                                <AgeRatingCheckboxToggleHandler ageRating="explicit">
+                                    <Checkbox
+                                        isChecked={ageRatingIn.includes(
+                                            "explicit"
+                                        )}
+                                        label={t("explicit")}
+                                    />
+                                </AgeRatingCheckboxToggleHandler>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
         </div>
     );
 }
