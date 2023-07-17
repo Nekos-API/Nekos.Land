@@ -11,6 +11,8 @@ export default function Footer() {
                 <Link href="https://github.com/Nekos-API/Nekos-Land" target="_blank" className="hover:text-rose-200 transition">GitHub repository</Link>
                 <b>&middot;</b>
                 <Link href="https://nekosapi.com" target="_blank" className="hover:text-rose-200 transition">API Docs</Link>
+                <b>&middot;</b>
+                <Link href="https://status.nekosapi.com" target="_blank" className="hover:text-rose-200 transition">Status</Link>
             </div>
         </div>
     )
