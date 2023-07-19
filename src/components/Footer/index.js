@@ -2,7 +2,7 @@ import Link from "next-intl/link";
 
 export default function Footer() {
     return (
-        <div className="flex flex-col items-center justify-center p-4 select-none">
+        <div className="hidden md:flex flex-col items-center justify-center p-4 select-none">
             <div className="text-neutral-600 flex flex-row items-center gap-2 text-sm">
                 Made with ❤️ by <Link href="https://nekidev.com" target="_blank" className="hover:text-rose-200 transition">Nekidev</Link>
                 <b>&middot;</b>

@@ -21,6 +21,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useSession, signIn } from "next-auth/react";
+import { useRouter } from "next-intl/client";
 import Link from "next-intl/link";
 
 import { ThemeContext } from "@/contexts/ThemeContext";
@@ -96,7 +97,7 @@ function getArtist(data) {
     return;
 }
 
-export default function Home() {
+export default function Home({ searchParams }) {
     const { setBgGradient } = React.useContext(ThemeContext);
     const [ageRatingIn, setAgeRatingIn] = React.useState([
         "sfw",
@@ -110,6 +111,7 @@ export default function Home() {
 
     const [isImageLiked, setIsImageLiked] = React.useState(false);
     const [isImageSaved, setIsImageSaved] = React.useState(false);
+    const [isImageReported, setIsImageReported] = React.useState(false);
     const [isArtistFollowed, setIsArtistFollowed] = React.useState(false);
 
     const [isFullScreenColorPaletteOpen, setIsFullScreenColorPaletteOpen] =
@@ -128,6 +130,7 @@ export default function Home() {
     const refreshImage = () => {
         setIsLoading(true);
         setIsImageLoading(true);
+        setIsImageReported(false);
         setError(false);
 
         fetch(
@@ -259,6 +262,8 @@ export default function Home() {
                     setIsImageLiked,
                     isImageSaved,
                     setIsImageSaved,
+                    isImageReported,
+                    setIsImageReported,
                     isArtistFollowed,
                     setIsArtistFollowed,
                 }}
@@ -390,38 +395,40 @@ export default function Home() {
                                 >
                                     <ShareIcon className="w-5 h-5" />
                                 </button>
-                                <button
-                                    className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 hover:scale-90 transition-all"
-                                    onClick={() => {
-                                        const errorJson = JSON.stringify(
-                                            {
-                                                imageID: data.data.id,
-                                                userID:
-                                                    session && session.user
-                                                        ? session.user.id
-                                                        : "Not logged in",
-                                                error: true,
-                                            },
-                                            null,
-                                            4
-                                        );
-                                        navigator.clipboard.writeText(
-                                            `There is an issue with this image in Nekos.Land:\n\`\`\`js\n${errorJson}\n\`\`\``
-                                        );
-                                        alert(
-                                            "An error message was copied to your clipboard. Send it to a moderator in our Discord server :3"
-                                        );
-                                    }}
-                                >
-                                    <FlagIcon className="w-5 h-5" />
-                                </button>
+                                {session && !isLoading && !error && !isImageReported ? (
+                                    <Link href="?modal=report">
+                                        <button
+                                            className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 hover:scale-90 transition-all"
+                                        >
+                                            <FlagIcon className="w-5 h-5" />
+                                        </button>
+                                    </Link>
+                                ) : !isImageReported ? (
+                                    <button
+                                        className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 transition-all cursor-not-allowed opacity-70"
+                                        onClick={() => {}}
+                                    >
+                                        <FlagIcon className="w-5 h-5" />
+                                    </button>
+                                ) : (
+                                    <button
+                                        className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 transition-all cursor-not-allowed"
+                                        onClick={() => {}}
+                                    >
+                                        <CheckIcon className="w-5 h-5" />
+                                    </button>
+                                )}
                             </div>
                         </div>
+                        <div className="h-12 md:hidden"></div>
                         <FiltersPanel />
                         <FullScreenColorPalette />
                     </FiltersContext.Provider>
                 </FullScreenColorPaletteContext.Provider>
             </ImageContext.Provider>
+            {!isLoading && !error && (
+                <ReportModal searchParams={searchParams} imageID={data.data.id} setIsImageReported={setIsImageReported} />
+            )}
         </main>
     );
 }
@@ -477,7 +484,7 @@ function FiltersPanel() {
                     ></motion.div>
                 )}
             </AnimatePresence>
-            <div className="fixed sm:fixed bottom-0 left-0 sm:left-auto right-0 lg:right-12 rounded-t sm:rounded-tl lg:rounded-t bg-neutral-900 sm:w-60">
+            <div className="fixed sm:fixed bottom-0 left-0 sm:left-auto right-0 lg:right-12 rounded-t sm:rounded-tl lg:rounded-t bg-neutral-900 sm:w-60 border border-neutral-800 lg:border-none">
                 <div
                     className="flex flex-row items-center justify-between leading-none p-4 cursor-pointer shadow-xl"
                     onClick={() => setIsOpen(!isOpen)}
@@ -942,6 +949,62 @@ function FullScreenColorPalette() {
                         {t("close")}
                     </motion.button>
                 </div>
+            )}
+        </AnimatePresence>
+    );
+}
+
+function ReportModal({ searchParams, imageID, setIsImageReported }) {
+    const session = useSession();
+    const t = useTranslations("Home");
+    const router = useRouter();
+
+    return (
+        <AnimatePresence>
+            {searchParams?.modal === "report" && (
+                <motion.div
+                    initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+                    animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
+                    exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+                    transition={{ duration: 0.15 }}
+                    className="fixed top-0 left-0 right-0 bottom-0 z-50 bg-black/50 flex items-center justify-center"
+                >
+                    <div className="absolute top-0 bottom-0 left-0 right-0" onClick={() => router.back()}></div>
+                    <div className="p-4 bg-neutral-900 rounded w-full max-w-md flex flex-col gap-4 z-10">
+                        <div className="font-medium text-xl">
+                            {t("report_this_image")}
+                        </div>
+                        <p className="leading-tight text-neutral-400">
+                            {t("image_report_description")}
+                        </p>
+                        <div className="w-full flex flex-row gap-4 items-center mt-1">
+                            <button
+                                className="p-2 rounded-lg leading-none font-medium flex-1 transition bg-neutral-800 hover:bg-neutral-700 text-neutral-300"
+                                onClick={() => router.back()}
+                            >
+                                {t("cancel")}
+                            </button>
+                            <button className="p-2 rounded-lg leading-none font-medium flex-1 transition bg-rose-400/10 hover:bg-rose-400/20 text-rose-400" onClick={async () => {
+                                fetch(`https://api.nekosapi.com/v2/images/${imageID}/report`, {
+                                    method: "POST",
+                                    headers: {
+                                        Authorization: `Bearer ${session.data.accessToken}`
+                                    }
+                                }).then((res) => {
+                                    if (!res.ok) {
+                                        alert("Something went wrong reporting this image :(");
+                                    }
+                                }).catch(() => {
+                                    alert("Something went wrong reporting this image :(");
+                                })
+                                setIsImageReported(true);
+                                router.back();
+                            }}>
+                                {t("report")}
+                            </button>
+                        </div>
+                    </div>
+                </motion.div>
             )}
         </AnimatePresence>
     );

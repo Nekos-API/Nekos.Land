@@ -30,6 +30,10 @@
         "no_source": "No source available",
         "no_age_rating": "No age rating available",
         "no_artist": "No artist",
-        "no_color_palette": "No color palette"
+        "no_color_palette": "No color palette",
+        "report_this_image": "Report this image?",
+        "image_report_description": "Reporting this image if there is something wrong with it (e.g. low quality, wrong details).",
+        "report": "Report",
+        "cancel": "Cancel"
     }
 }

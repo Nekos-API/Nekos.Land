@@ -30,6 +30,10 @@
         "no_source": "No se encontró la fuente",
         "no_age_rating": "Sin clasificar",
         "no_artist": "No se encontró el/la artista",
-        "no_color_palette": "No se encontró la paleta de colores"
+        "no_color_palette": "No se encontró la paleta de colores",
+        "report_this_image": "¿Reportar esta imagen?",
+        "image_report_description": "Reporta esta imagen si hay algo que esta mal con ella (ej. baja calidad, información incorrecta).",
+        "report": "Reportar",
+        "cancel": "Cancelar"
     }
 }
