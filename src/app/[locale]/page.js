@@ -390,7 +390,7 @@ export default function Home({ searchParams }) {
                                         navigator.clipboard.writeText(
                                             data.data.attributes.file
                                         );
-                                        alert(t("copied"));
+                                        alert(t("copied_image_url"));
                                     }}
                                 >
                                     <ShareIcon className="w-5 h-5" />
@@ -916,7 +916,7 @@ function FullScreenColorPalette() {
                                             navigator.clipboard.writeText(
                                                 color
                                             );
-                                            alert("Copied to clipboard!");
+                                            alert(t("copied"));
                                         }}
                                     >
                                         <div
@@ -992,10 +992,10 @@ function ReportModal({ searchParams, imageID, setIsImageReported }) {
                                     }
                                 }).then((res) => {
                                     if (!res.ok) {
-                                        alert("Something went wrong reporting this image :(");
+                                        alert(t("image_report_error"));
                                     }
                                 }).catch(() => {
-                                    alert("Something went wrong reporting this image :(");
+                                    alert(t("image_report_error"));
                                 })
                                 setIsImageReported(true);
                                 router.back();

@@ -11,7 +11,7 @@
     "Home": {
         "refresh": "Refresh!",
         "share": "Share",
-        "copied": "Image URL copied to clipboard!",
+        "copied_image_url": "Image URL copied to clipboard!",
         "filter": "Filter",
         "age_rating": "Age rating",
         "sfw": "Safe for work",
@@ -34,6 +34,8 @@
         "report_this_image": "Report this image?",
         "image_report_description": "Reporting this image if there is something wrong with it (e.g. low quality, wrong details).",
         "report": "Report",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "copied": "Copied to clipboard!",
+        "image_report_error": "Something went wrong reporting this image :("
     }
 }
