@@ -36,6 +36,7 @@
         "report": "Report",
         "cancel": "Cancel",
         "copied": "Copied to clipboard!",
-        "image_report_error": "Something went wrong reporting this image :("
+        "image_report_error": "Something went wrong reporting this image :(",
+        "optional_image_report_reason": "Why do you want to report this image? (optional)"
     }
 }

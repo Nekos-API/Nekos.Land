@@ -36,6 +36,7 @@
         "report": "Reportar",
         "cancel": "Cancelar",
         "copied": "Copiado en el portapapeles!",
-        "image_report_error": "Algo anduvo mal cuando se reportaba la imagen :("
+        "image_report_error": "Algo anduvo mal cuando se reportaba la imagen :(",
+        "optional_image_report_reason": "¿Por que quieres reportar esta imagen? (opcional)"
     }
 }

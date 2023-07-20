@@ -395,11 +395,12 @@ export default function Home({ searchParams }) {
                                 >
                                     <ShareIcon className="w-5 h-5" />
                                 </button>
-                                {session && !isLoading && !error && !isImageReported ? (
+                                {session &&
+                                !isLoading &&
+                                !error &&
+                                !isImageReported ? (
                                     <Link href="?modal=report">
-                                        <button
-                                            className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 hover:scale-90 transition-all"
-                                        >
+                                        <button className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 hover:scale-90 transition-all">
                                             <FlagIcon className="w-5 h-5" />
                                         </button>
                                     </Link>
@@ -427,7 +428,11 @@ export default function Home({ searchParams }) {
                 </FullScreenColorPaletteContext.Provider>
             </ImageContext.Provider>
             {!isLoading && !error && (
-                <ReportModal searchParams={searchParams} imageID={data.data.id} setIsImageReported={setIsImageReported} />
+                <ReportModal
+                    searchParams={searchParams}
+                    imageID={data.data.id}
+                    setIsImageReported={setIsImageReported}
+                />
             )}
         </main>
     );
@@ -959,6 +964,8 @@ function ReportModal({ searchParams, imageID, setIsImageReported }) {
     const t = useTranslations("Home");
     const router = useRouter();
 
+    const reportReasonRef = React.useRef();
+
     return (
         <AnimatePresence>
             {searchParams?.modal === "report" && (
@@ -969,7 +976,10 @@ function ReportModal({ searchParams, imageID, setIsImageReported }) {
                     transition={{ duration: 0.15 }}
                     className="fixed top-0 left-0 right-0 bottom-0 z-50 bg-black/50 flex items-center justify-center"
                 >
-                    <div className="absolute top-0 bottom-0 left-0 right-0" onClick={() => router.back()}></div>
+                    <div
+                        className="absolute top-0 bottom-0 left-0 right-0"
+                        onClick={() => router.back()}
+                    ></div>
                     <div className="p-4 bg-neutral-900 rounded w-full max-w-md flex flex-col gap-4 z-10">
                         <div className="font-medium text-xl">
                             {t("report_this_image")}
@@ -977,6 +987,13 @@ function ReportModal({ searchParams, imageID, setIsImageReported }) {
                         <p className="leading-tight text-neutral-400">
                             {t("image_report_description")}
                         </p>
+                        <textarea
+                            className="rounded-lg bg-neutral-950 text-sm w-full resize-y p-2 outline-none text-neutral-300 transition focus:ring-1 focus:ring-rose-400 placeholder:text-neutral-400"
+                            placeholder={t("optional_image_report_reason")}
+                            ref={reportReasonRef}
+                            maxLength={200}
+                            rows={3}
+                        ></textarea>
                         <div className="w-full flex flex-row gap-4 items-center mt-1">
                             <button
                                 className="p-2 rounded-lg leading-none font-medium flex-1 transition bg-neutral-800 hover:bg-neutral-700 text-neutral-300"
@@ -984,22 +1001,32 @@ function ReportModal({ searchParams, imageID, setIsImageReported }) {
                             >
                                 {t("cancel")}
                             </button>
-                            <button className="p-2 rounded-lg leading-none font-medium flex-1 transition bg-rose-400/10 hover:bg-rose-400/20 text-rose-400" onClick={async () => {
-                                fetch(`https://api.nekosapi.com/v2/images/${imageID}/report`, {
-                                    method: "POST",
-                                    headers: {
-                                        Authorization: `Bearer ${session.data.accessToken}`
-                                    }
-                                }).then((res) => {
-                                    if (!res.ok) {
-                                        alert(t("image_report_error"));
-                                    }
-                                }).catch(() => {
-                                    alert(t("image_report_error"));
-                                })
-                                setIsImageReported(true);
-                                router.back();
-                            }}>
+                            <button
+                                className="p-2 rounded-lg leading-none font-medium flex-1 transition bg-rose-400/10 hover:bg-rose-400/20 text-rose-400"
+                                onClick={async () => {
+                                    fetch(
+                                        `https://api.nekosapi.com/v2/images/${imageID}/report?reason=${encodeURIComponent(
+                                            reportReasonRef.current.value
+                                        )}`,
+                                        {
+                                            method: "POST",
+                                            headers: {
+                                                Authorization: `Bearer ${session.data.accessToken}`,
+                                            },
+                                        }
+                                    )
+                                        .then((res) => {
+                                            if (!res.ok) {
+                                                alert(t("image_report_error"));
+                                            }
+                                        })
+                                        .catch(() => {
+                                            alert(t("image_report_error"));
+                                        });
+                                    setIsImageReported(true);
+                                    router.back();
+                                }}
+                            >
                                 {t("report")}
                             </button>
                         </div>
