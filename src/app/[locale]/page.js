@@ -980,7 +980,7 @@ function ReportModal({ searchParams, imageID, setIsImageReported }) {
                         className="absolute top-0 bottom-0 left-0 right-0"
                         onClick={() => router.back()}
                     ></div>
-                    <div className="p-4 bg-neutral-900 rounded w-full max-w-md flex flex-col gap-4 z-10">
+                    <div className="p-4 bg-neutral-900 rounded w-full max-w-md flex flex-col gap-4 z-10 mx-4">
                         <div className="font-medium text-xl">
                             {t("report_this_image")}
                         </div>
