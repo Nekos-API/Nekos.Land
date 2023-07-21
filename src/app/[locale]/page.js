@@ -472,12 +472,15 @@ function FiltersPanel() {
                         className="fixed md:hidden top-0 bottom-0 left-0 right-0 bg-black/50"
                         initial={{
                             opacity: 0,
+                            backdropFilter: "blur(0px)",
                         }}
                         animate={{
                             opacity: 1,
+                            backdropFilter: "blur(8px)",
                         }}
                         exit={{
                             opacity: 0,
+                            backdropFilter: "blur(0px)",
                         }}
                         transition={{ duration: 0.3 }}
                         onClick={() => {
