@@ -11,7 +11,7 @@
     "Home": {
         "refresh": "Otra imagen!",
         "share": "Compartir",
-        "copied": "La URL de la imagen ha sido copiada en tu portapapeles!",
+        "copied_image_url": "La URL de la imagen ha sido copiada en tu portapapeles!",
         "filter": "Filtrar",
         "age_rating": "Clasificación de Edad",
         "sfw": "Apto para todo público",
@@ -30,6 +30,14 @@
         "no_source": "No se encontró la fuente",
         "no_age_rating": "Sin clasificar",
         "no_artist": "No se encontró el/la artista",
-        "no_color_palette": "No se encontró la paleta de colores"
+        "no_color_palette": "No se encontró la paleta de colores",
+        "report_this_image": "¿Reportar esta imagen?",
+        "image_report_description": "Reporta esta imagen si hay algo que esta mal con ella (ej. baja calidad, información incorrecta).",
+        "report": "Reportar",
+        "cancel": "Cancelar",
+        "copied": "Copiado en el portapapeles!",
+        "image_report_error": "Algo anduvo mal cuando se reportaba la imagen :(",
+        "optional_image_report_reason": "¿Por que quieres reportar esta imagen? (opcional)",
+        "copied_image_report": "Se ha copiado un mensaje de error en tu portapapeles. Envíalo en el canal #image-reports de la comunidad de Discord :3 (esto es automático si inicias sesión)"
     }
 }

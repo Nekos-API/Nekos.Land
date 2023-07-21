@@ -37,10 +37,16 @@ export default async function RootLayout({ children, params: { locale } }) {
                     Nekos.Land - UwU-nique Adventures with +29.4k Anime Image
                     Meowsterpieces!
                 </title>
+                <meta property="og:type" content="website" />
                 <meta
                     name="og:description"
                     content="Explore +29.4k adorable anime images in Nekos.Land, where charming meows and purrfection await! Join our Discord server for a meow-tastic community of anime enthusiasts. Embrace the kawaii wonders and unleash your love for anime!"
                 />
+                <meta
+                    name="twitter:description"
+                    content="Explore +29.4k adorable anime images in Nekos.Land, where charming meows and purrfection await! Join our Discord server for a meow-tastic community of anime enthusiasts. Embrace the kawaii wonders and unleash your love for anime!"
+                />
+                <meta name="theme-color" content="#fb7185" />
             </head>
             <body className={rubik.className}>
                 <SessionProvider>
