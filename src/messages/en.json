@@ -37,6 +37,7 @@
         "cancel": "Cancel",
         "copied": "Copied to clipboard!",
         "image_report_error": "Something went wrong reporting this image :(",
-        "optional_image_report_reason": "Why do you want to report this image? (optional)"
+        "optional_image_report_reason": "Why do you want to report this image? (optional)",
+        "copied_image_report": "An error message was copied to your clipboard. Post it in the #image-reports channel in our Discord server :3 (this is automatic if you log in)"
     }
 }

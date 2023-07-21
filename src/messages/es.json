@@ -37,6 +37,7 @@
         "cancel": "Cancelar",
         "copied": "Copiado en el portapapeles!",
         "image_report_error": "Algo anduvo mal cuando se reportaba la imagen :(",
-        "optional_image_report_reason": "¿Por que quieres reportar esta imagen? (opcional)"
+        "optional_image_report_reason": "¿Por que quieres reportar esta imagen? (opcional)",
+        "copied_image_report": "Se ha copiado un mensaje de error en tu portapapeles. Envíalo en el canal #image-reports de la comunidad de Discord :3 (esto es automático si inicias sesión)"
     }
 }

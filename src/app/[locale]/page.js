@@ -395,10 +395,7 @@ export default function Home({ searchParams }) {
                                 >
                                     <ShareIcon className="w-5 h-5" />
                                 </button>
-                                {session &&
-                                !isLoading &&
-                                !error &&
-                                !isImageReported ? (
+                                {!isLoading && !error && !isImageReported ? (
                                     <Link href="?modal=report">
                                         <button className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 hover:scale-90 transition-all">
                                             <FlagIcon className="w-5 h-5" />
@@ -516,44 +513,24 @@ function FiltersPanel() {
                                 <span className="text-xs font-semibold text-rose-400 leading-none mb-2 block">
                                     {t("age_rating")}
                                 </span>
-                                <AgeRatingCheckboxToggleHandler ageRating="sfw">
-                                    <Checkbox
-                                        isChecked={ageRatingIn.includes("sfw")}
-                                        label={t("sfw")}
-                                    />
-                                </AgeRatingCheckboxToggleHandler>
-                                <AgeRatingCheckboxToggleHandler ageRating="questionable">
-                                    <Checkbox
-                                        isChecked={ageRatingIn.includes(
-                                            "questionable"
-                                        )}
-                                        label={t("questionable")}
-                                    />
-                                </AgeRatingCheckboxToggleHandler>
-                                <AgeRatingCheckboxToggleHandler ageRating="suggestive">
-                                    <Checkbox
-                                        isChecked={ageRatingIn.includes(
-                                            "suggestive"
-                                        )}
-                                        label={t("suggestive")}
-                                    />
-                                </AgeRatingCheckboxToggleHandler>
-                                <AgeRatingCheckboxToggleHandler ageRating="borderline">
-                                    <Checkbox
-                                        isChecked={ageRatingIn.includes(
-                                            "borderline"
-                                        )}
-                                        label={t("borderline")}
-                                    />
-                                </AgeRatingCheckboxToggleHandler>
-                                <AgeRatingCheckboxToggleHandler ageRating="explicit">
-                                    <Checkbox
-                                        isChecked={ageRatingIn.includes(
-                                            "explicit"
-                                        )}
-                                        label={t("explicit")}
-                                    />
-                                </AgeRatingCheckboxToggleHandler>
+                                {[
+                                    "sfw",
+                                    "questionable",
+                                    "suggestive",
+                                    "borderline",
+                                    "explicit",
+                                ].map((ageRating) => (
+                                    <AgeRatingCheckboxToggleHandler
+                                        ageRating={ageRating}
+                                    >
+                                        <Checkbox
+                                            isChecked={ageRatingIn.includes(
+                                                ageRating
+                                            )}
+                                            label={t(ageRating)}
+                                        />
+                                    </AgeRatingCheckboxToggleHandler>
+                                ))}
                             </div>
                         </motion.div>
                     )}
@@ -1004,25 +981,50 @@ function ReportModal({ searchParams, imageID, setIsImageReported }) {
                             <button
                                 className="p-2 rounded-lg leading-none font-medium flex-1 transition bg-rose-400/10 hover:bg-rose-400/20 text-rose-400"
                                 onClick={async () => {
-                                    fetch(
-                                        `https://api.nekosapi.com/v2/images/${imageID}/report?reason=${encodeURIComponent(
-                                            reportReasonRef.current.value
-                                        )}`,
-                                        {
-                                            method: "POST",
-                                            headers: {
-                                                Authorization: `Bearer ${session.data.accessToken}`,
-                                            },
-                                        }
-                                    )
-                                        .then((res) => {
-                                            if (!res.ok) {
-                                                alert(t("image_report_error"));
+                                    if (session.data) {
+                                        fetch(
+                                            `https://api.nekosapi.com/v2/images/${imageID}/report?reason=${encodeURIComponent(
+                                                reportReasonRef.current.value
+                                            )}`,
+                                            {
+                                                method: "POST",
+                                                headers: {
+                                                    Authorization: `Bearer ${session.data.accessToken}`,
+                                                },
                                             }
-                                        })
-                                        .catch(() => {
-                                            alert(t("image_report_error"));
-                                        });
+                                        )
+                                            .then((res) => {
+                                                if (!res.ok) {
+                                                    alert(
+                                                        t("image_report_error")
+                                                    );
+                                                }
+                                            })
+                                            .catch(() => {
+                                                alert(t("image_report_error"));
+                                            });
+                                    } else {
+                                        const errorJson = JSON.stringify(
+                                            {
+                                                imageID: imageID,
+                                                user: null,
+                                                error: true,
+                                            },
+                                            null,
+                                            4
+                                        );
+                                        navigator.clipboard.writeText(
+                                            `There is an issue with this image in Nekos.Land:\n\`\`\`js\n${errorJson}\n\`\`\`` +
+                                                (reportReasonRef.current.value
+                                                    .length > 0
+                                                    ? `\nReason:\n> ${reportReasonRef.current.value}`
+                                                    : "")
+                                        );
+                                        alert(
+                                            t("copied_image_report")
+                                        );
+                                    }
+
                                     setIsImageReported(true);
                                     router.back();
                                 }}
