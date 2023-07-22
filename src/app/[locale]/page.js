@@ -16,6 +16,7 @@ import {
 } from "@heroicons/react/24/outline";
 import {
     BookmarkIcon as BookmarkIconSolid,
+    ExclamationTriangleIcon,
     HeartIcon as HeartIconSolid,
 } from "@heroicons/react/24/solid";
 import { motion, AnimatePresence } from "framer-motion";
@@ -134,7 +135,9 @@ export default function Home({ searchParams }) {
         setError(false);
 
         fetch(
-            `https://api.nekosapi.com/v2/images/random?filter[ageRating.in]=${encodeURIComponent(
+            `https://api.nekosapi.com/v2/images/random?filter[verificationStatus.in]=${encodeURIComponent(
+                ["verified", "on_review", "not_reviewed"].join(",")
+            )}&filter[ageRating.in]=${encodeURIComponent(
                 ageRatingIn.join(",")
             )}`,
             {
@@ -428,6 +431,7 @@ export default function Home({ searchParams }) {
                 <ReportModal
                     searchParams={searchParams}
                     imageID={data.data.id}
+                    verificationStatus={data.data.attributes.verificationStatus}
                     setIsImageReported={setIsImageReported}
                 />
             )}
@@ -939,7 +943,7 @@ function FullScreenColorPalette() {
     );
 }
 
-function ReportModal({ searchParams, imageID, setIsImageReported }) {
+function ReportModal({ searchParams, imageID, verificationStatus, setIsImageReported }) {
     const session = useSession();
     const t = useTranslations("Home");
     const router = useRouter();
@@ -960,80 +964,88 @@ function ReportModal({ searchParams, imageID, setIsImageReported }) {
                         className="absolute top-0 bottom-0 left-0 right-0"
                         onClick={() => router.back()}
                     ></div>
-                    <div className="p-4 bg-neutral-900 rounded w-full max-w-md flex flex-col gap-4 z-10 mx-4">
-                        <div className="font-medium text-xl">
-                            {t("report_this_image")}
-                        </div>
-                        <p className="leading-tight text-neutral-400">
-                            {t("image_report_description")}
-                        </p>
-                        <textarea
-                            className="rounded-lg bg-neutral-950 text-sm w-full resize-y p-2 outline-none text-neutral-300 transition focus:ring-1 focus:ring-rose-400 placeholder:text-neutral-400"
-                            placeholder={t("optional_image_report_reason")}
-                            ref={reportReasonRef}
-                            maxLength={200}
-                            rows={3}
-                        ></textarea>
-                        <div className="w-full flex flex-row gap-4 items-center mt-1">
-                            <button
-                                className="p-2 rounded-lg leading-none font-medium flex-1 transition bg-neutral-800 hover:bg-neutral-700 text-neutral-300"
-                                onClick={() => router.back()}
-                            >
-                                {t("cancel")}
-                            </button>
-                            <button
-                                className="p-2 rounded-lg leading-none font-medium flex-1 transition bg-rose-400/10 hover:bg-rose-400/20 text-rose-400"
-                                onClick={async () => {
-                                    if (session.data) {
-                                        fetch(
-                                            `https://api.nekosapi.com/v2/images/${imageID}/report?reason=${encodeURIComponent(
-                                                reportReasonRef.current.value
-                                            )}`,
-                                            {
-                                                method: "POST",
-                                                headers: {
-                                                    Authorization: `Bearer ${session.data.accessToken}`,
-                                                },
-                                            }
-                                        )
-                                            .then((res) => {
-                                                if (!res.ok) {
-                                                    alert(
-                                                        t("image_report_error")
-                                                    );
+                    <div className="flex flex-col items-center justify-center gap-4 m-4">
+                        {verificationStatus != "verified" && (
+                            <div className="w-full max-w-md bg-black rounded relative mx-4">
+                                <div className="rounded w-full p-4 border border-yellow-400/50 bg-yellow-400/20 flex flex-row items-start gap-4 text-yellow-200">
+                                    <ExclamationTriangleIcon className="h-6 w-6 text-yellow-400 shrink-0" />
+                                    <div dangerouslySetInnerHTML={{__html: verificationStatus == "on_review" ? t.raw("image_on_review") : t.raw("image_not_reviewed")}}></div>
+                                </div>
+                            </div>
+                        )}
+                        <div className="p-4 bg-neutral-900 rounded w-full max-w-md flex flex-col gap-4 z-10 mx-4">
+                            <div className="font-medium text-xl">
+                                {t("report_this_image")}
+                            </div>
+                            <p className="leading-tight text-neutral-400">
+                                {t("image_report_description")}
+                            </p>
+                            <textarea
+                                className="rounded-lg bg-neutral-950 text-sm w-full resize-y p-2 outline-none text-neutral-300 transition focus:ring-1 focus:ring-rose-400 placeholder:text-neutral-400"
+                                placeholder={t("optional_image_report_reason")}
+                                ref={reportReasonRef}
+                                maxLength={200}
+                                rows={3}
+                            ></textarea>
+                            <div className="w-full flex flex-row gap-4 items-center mt-1">
+                                <button
+                                    className="p-2 rounded-lg leading-none font-medium flex-1 transition bg-neutral-800 hover:bg-neutral-700 text-neutral-300"
+                                    onClick={() => router.back()}
+                                >
+                                    {t("cancel")}
+                                </button>
+                                <button
+                                    className="p-2 rounded-lg leading-none font-medium flex-1 transition bg-rose-400/10 hover:bg-rose-400/20 text-rose-400"
+                                    onClick={async () => {
+                                        if (session.data) {
+                                            fetch(
+                                                `https://api.nekosapi.com/v2/images/${imageID}/report?reason=${encodeURIComponent(
+                                                    reportReasonRef.current.value
+                                                )}`,
+                                                {
+                                                    method: "POST",
+                                                    headers: {
+                                                        Authorization: `Bearer ${session.data.accessToken}`,
+                                                    },
                                                 }
-                                            })
-                                            .catch(() => {
-                                                alert(t("image_report_error"));
-                                            });
-                                    } else {
-                                        const errorJson = JSON.stringify(
-                                            {
-                                                imageID: imageID,
-                                                user: null,
-                                                error: true,
-                                            },
-                                            null,
-                                            4
-                                        );
-                                        navigator.clipboard.writeText(
-                                            `There is an issue with this image in Nekos.Land:\n\`\`\`js\n${errorJson}\n\`\`\`` +
-                                                (reportReasonRef.current.value
-                                                    .length > 0
-                                                    ? `\nReason:\n> ${reportReasonRef.current.value}`
-                                                    : "")
-                                        );
-                                        alert(
-                                            t("copied_image_report")
-                                        );
-                                    }
+                                            )
+                                                .then((res) => {
+                                                    if (!res.ok) {
+                                                        alert(
+                                                            t("image_report_error")
+                                                        );
+                                                    }
+                                                })
+                                                .catch(() => {
+                                                    alert(t("image_report_error"));
+                                                });
+                                        } else {
+                                            const errorJson = JSON.stringify(
+                                                {
+                                                    imageID: imageID,
+                                                    user: null,
+                                                    error: true,
+                                                },
+                                                null,
+                                                4
+                                            );
+                                            navigator.clipboard.writeText(
+                                                `There is an issue with this image in Nekos.Land:\n\`\`\`js\n${errorJson}\n\`\`\`` +
+                                                    (reportReasonRef.current.value
+                                                        .length > 0
+                                                        ? `\nReason:\n> ${reportReasonRef.current.value}`
+                                                        : "")
+                                            );
+                                            alert(t("copied_image_report"));
+                                        }
 
-                                    setIsImageReported(true);
-                                    router.back();
-                                }}
-                            >
-                                {t("report")}
-                            </button>
+                                        setIsImageReported(true);
+                                        router.back();
+                                    }}
+                                >
+                                    {t("report")}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </motion.div>

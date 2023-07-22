@@ -38,6 +38,8 @@
         "copied": "Copiado en el portapapeles!",
         "image_report_error": "Algo anduvo mal cuando se reportaba la imagen :(",
         "optional_image_report_reason": "¿Por que quieres reportar esta imagen? (opcional)",
-        "copied_image_report": "Se ha copiado un mensaje de error en tu portapapeles. Envíalo en el canal #image-reports de la comunidad de Discord :3 (esto es automático si inicias sesión)"
+        "copied_image_report": "Se ha copiado un mensaje de error en tu portapapeles. Envíalo en el canal #image-reports de la comunidad de Discord :3 (esto es automático si inicias sesión)",
+        "image_not_reviewed": "Esta imagen no ha sido revisada todavía, por lo que no hay necesidad de reportarla. Puedes leer mas sobre esto <a href='https://nekosapi.com/guides/content-moderation' class='text-rose-400' target='_blank'>aquí</a>.",
+        "image_on_review": "Esta imagen aun esta siendo revisada, por lo que no hay necesidad de reportarla. Puedes leer mas sobre esto <a href='https://nekosapi.com/guides/content-moderation' class='text-rose-400' target='_blank'>aquí</a>."
     }
 }
