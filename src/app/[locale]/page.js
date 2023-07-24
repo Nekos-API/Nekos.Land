@@ -128,6 +128,27 @@ export default function Home({ searchParams }) {
         }
     }, [session]);
 
+    React.useEffect(() => {
+        const handleKeyDown = (event) => {
+            // Check if Ctrl + R (or Cmd + R on macOS) is pressed
+            if ((event.ctrlKey || event.metaKey) && event.key === "r") {
+                // Prevent the default browser refresh behavior
+                event.preventDefault();
+
+                // Call the refreshImage() function when Ctrl + R is pressed
+                refreshImage();
+            }
+        };
+
+        // Add the event listener when the component mounts
+        document.addEventListener("keydown", handleKeyDown);
+
+        // Clean up the event listener when the component unmounts
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+        };
+    }, []);
+
     const refreshImage = () => {
         setIsLoading(true);
         setIsImageLoading(true);
@@ -315,7 +336,11 @@ export default function Home({ searchParams }) {
                                         className="w-full max-w-sm rounded object-cover object-center bg-neutral-900 transition-all duration-300"
                                         style={{
                                             opacity:
-                                                !isLoading && !error ? 1 : 384,
+                                                !isLoading &&
+                                                !isImageLoading &&
+                                                !error
+                                                    ? 1
+                                                    : 0,
                                         }}
                                         onLoad={() => {
                                             setIsImageLoading(false);
@@ -943,16 +968,69 @@ function FullScreenColorPalette() {
     );
 }
 
-function ReportModal({ searchParams, imageID, verificationStatus, setIsImageReported }) {
+function ReportModal({
+    searchParams,
+    imageID,
+    verificationStatus,
+    setIsImageReported,
+}) {
     const session = useSession();
     const t = useTranslations("Home");
     const router = useRouter();
 
     const reportReasonRef = React.useRef();
 
+    const reportImage = async (e = null) => {
+        if (e != null) {
+            e.preventDefault();
+        }
+
+        if (session.data) {
+            fetch(
+                `https://api.nekosapi.com/v2/images/${imageID}/report?reason=${encodeURIComponent(
+                    reportReasonRef.current.value
+                )}`,
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${session.data.accessToken}`,
+                    },
+                }
+            )
+                .then((res) => {
+                    if (!res.ok) {
+                        alert(t("image_report_error"));
+                    }
+                })
+                .catch(() => {
+                    alert(t("image_report_error"));
+                });
+        } else {
+            const errorJson = JSON.stringify(
+                {
+                    imageID: imageID,
+                    user: null,
+                    error: true,
+                },
+                null,
+                4
+            );
+            navigator.clipboard.writeText(
+                `There is an issue with this image in Nekos.Land:\n\`\`\`js\n${errorJson}\n\`\`\`` +
+                    (reportReasonRef.current.value.length > 0
+                        ? `\nReason:\n> ${reportReasonRef.current.value}`
+                        : "")
+            );
+            alert(t("copied_image_report"));
+        }
+
+        setIsImageReported(true);
+        router.back();
+    };
+
     return (
         <AnimatePresence>
-            {searchParams?.modal === "report" && (
+            {searchParams?.modal && searchParams.modal.split(",").includes("report") && (
                 <motion.div
                     initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
                     animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
@@ -964,16 +1042,35 @@ function ReportModal({ searchParams, imageID, verificationStatus, setIsImageRepo
                         className="absolute top-0 bottom-0 left-0 right-0"
                         onClick={() => router.back()}
                     ></div>
-                    <div className="flex flex-col items-center justify-center gap-4 m-4">
+                    <motion.div
+                        className="flex flex-col items-center justify-center gap-4 m-4"
+                        initial={{ scale: .95 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: .95 }}
+                        transition={{ duration: .15 }}
+                    >
                         {verificationStatus != "verified" && (
                             <div className="w-full max-w-md bg-black rounded relative mx-4">
                                 <div className="rounded w-full p-4 border border-yellow-400/50 bg-yellow-400/20 flex flex-row items-start gap-4 text-yellow-200">
                                     <ExclamationTriangleIcon className="h-6 w-6 text-yellow-400 shrink-0" />
-                                    <div dangerouslySetInnerHTML={{__html: verificationStatus == "on_review" ? t.raw("image_on_review") : t.raw("image_not_reviewed")}}></div>
+                                    <div
+                                        dangerouslySetInnerHTML={{
+                                            __html:
+                                                verificationStatus ==
+                                                "on_review"
+                                                    ? t.raw("image_on_review")
+                                                    : t.raw(
+                                                          "image_not_reviewed"
+                                                      ),
+                                        }}
+                                    ></div>
                                 </div>
                             </div>
                         )}
-                        <div className="p-4 bg-neutral-900 rounded w-full max-w-md flex flex-col gap-4 z-10 mx-4">
+                        <form
+                            className="p-4 bg-neutral-900 rounded w-full max-w-md flex flex-col gap-4 z-10 mx-4"
+                            onSubmit={reportImage}
+                        >
                             <div className="font-medium text-xl">
                                 {t("report_this_image")}
                             </div>
@@ -990,64 +1087,20 @@ function ReportModal({ searchParams, imageID, verificationStatus, setIsImageRepo
                             <div className="w-full flex flex-row gap-4 items-center mt-1">
                                 <button
                                     className="p-2 rounded-lg leading-none font-medium flex-1 transition bg-neutral-800 hover:bg-neutral-700 text-neutral-300"
+                                    type="button"
                                     onClick={() => router.back()}
                                 >
                                     {t("cancel")}
                                 </button>
                                 <button
                                     className="p-2 rounded-lg leading-none font-medium flex-1 transition bg-rose-400/10 hover:bg-rose-400/20 text-rose-400"
-                                    onClick={async () => {
-                                        if (session.data) {
-                                            fetch(
-                                                `https://api.nekosapi.com/v2/images/${imageID}/report?reason=${encodeURIComponent(
-                                                    reportReasonRef.current.value
-                                                )}`,
-                                                {
-                                                    method: "POST",
-                                                    headers: {
-                                                        Authorization: `Bearer ${session.data.accessToken}`,
-                                                    },
-                                                }
-                                            )
-                                                .then((res) => {
-                                                    if (!res.ok) {
-                                                        alert(
-                                                            t("image_report_error")
-                                                        );
-                                                    }
-                                                })
-                                                .catch(() => {
-                                                    alert(t("image_report_error"));
-                                                });
-                                        } else {
-                                            const errorJson = JSON.stringify(
-                                                {
-                                                    imageID: imageID,
-                                                    user: null,
-                                                    error: true,
-                                                },
-                                                null,
-                                                4
-                                            );
-                                            navigator.clipboard.writeText(
-                                                `There is an issue with this image in Nekos.Land:\n\`\`\`js\n${errorJson}\n\`\`\`` +
-                                                    (reportReasonRef.current.value
-                                                        .length > 0
-                                                        ? `\nReason:\n> ${reportReasonRef.current.value}`
-                                                        : "")
-                                            );
-                                            alert(t("copied_image_report"));
-                                        }
-
-                                        setIsImageReported(true);
-                                        router.back();
-                                    }}
+                                    type="submit"
                                 >
                                     {t("report")}
                                 </button>
                             </div>
-                        </div>
-                    </div>
+                        </form>
+                    </motion.div>
                 </motion.div>
             )}
         </AnimatePresence>

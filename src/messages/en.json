@@ -6,7 +6,10 @@
         "log_in": "Log In",
         "log_out": "Log Out",
         "website": "Website",
-        "links": "Links"
+        "links": "Links",
+        "profile": "Profile",
+        "settings": "Settings",
+        "library": "Library"
     },
     "Home": {
         "refresh": "Refresh!",
@@ -41,5 +44,29 @@
         "copied_image_report": "An error message was copied to your clipboard. Post it in the #image-reports channel in our Discord server :3 (this is automatic if you log in)",
         "image_not_reviewed": "This image has not been reviewed yet, so there is no need to report it. You can read more about this <a href='https://nekosapi.com/guides/content-moderation' class='text-rose-400' target='_blank'>here</a>.",
         "image_on_review": "This image is still being reviewed, so there is no need to report it. You can read more about this <a href='https://nekosapi.com/guides/content-moderation' class='text-rose-400' target='_blank'>here</a>."
+    },
+    "Settings": {
+        "settings": "Settings",
+        "error": "Oopsie! An error occurred :(",
+        "profile": "Profile",
+        "account": "Account",
+        "applications": "Applications",
+        "username": "Username",
+        "nickname": "Nickname",
+        "biography": "Biography",
+        "biography_placeholder": "Hii, I'm {name} and I love catgirls :)",
+        "email": "Email",
+        "password": "Password",
+        "change_password": "Change password",
+        "verified": "Verified",
+        "available": "Available",
+        "unavailable": "Unavailable",
+        "loading": "Loading",
+        "invalid_username": "Invalid. Only lowercase letters, numbers, underscore and dots are allowed",
+        "username_too_short": "Too short",
+        "discard_changes": "Discard",
+        "save_changes": "Save changes",
+        "saved_changes": "Changes saved",
+        "wip": "Some construction nekos are already working on this :)"
     }
 }

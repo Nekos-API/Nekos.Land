@@ -15,6 +15,7 @@ import { ThemeContextProvider } from "@/contexts/ThemeContext";
 import NavigationBar from "@/components/NavigationBar";
 import BackgroundGradient from "@/components/BackgroundGradient";
 import Footer from "@/components/Footer";
+import SettingsModal from "@/components/SettingsModal";
 
 const rubik = Rubik({ subsets: ["latin", "latin-ext"] });
 
@@ -22,7 +23,7 @@ export function generateStaticParams() {
     return [{ locale: "en" }, { locale: "es" }];
 }
 
-export default async function RootLayout({ children, params: { locale } }) {
+export default async function RootLayout({ children, params: { locale }, searchParams }) {
     let messages;
     try {
         messages = (await import(`../../messages/${locale}.json`)).default;
@@ -34,17 +35,17 @@ export default async function RootLayout({ children, params: { locale } }) {
         <html lang={locale}>
             <head>
                 <title>
-                    Nekos.Land - UwU-nique Adventures with +29.4k Anime Image
+                    Nekos.Land - UwU-nique Adventures with +23.2k Anime Image
                     Meowsterpieces!
                 </title>
                 <meta property="og:type" content="website" />
                 <meta
                     name="og:description"
-                    content="Explore +29.4k adorable anime images in Nekos.Land, where charming meows and purrfection await! Join our Discord server for a meow-tastic community of anime enthusiasts. Embrace the kawaii wonders and unleash your love for anime!"
+                    content="Explore +23.2k adorable anime images in Nekos.Land, where charming meows and purrfection await! Join our Discord server for a meow-tastic community of anime enthusiasts. Embrace the kawaii wonders and unleash your love for anime!"
                 />
                 <meta
                     name="twitter:description"
-                    content="Explore +29.4k adorable anime images in Nekos.Land, where charming meows and purrfection await! Join our Discord server for a meow-tastic community of anime enthusiasts. Embrace the kawaii wonders and unleash your love for anime!"
+                    content="Explore +23.2k adorable anime images in Nekos.Land, where charming meows and purrfection await! Join our Discord server for a meow-tastic community of anime enthusiasts. Embrace the kawaii wonders and unleash your love for anime!"
                 />
                 <meta name="theme-color" content="#fb7185" />
             </head>
@@ -63,6 +64,7 @@ export default async function RootLayout({ children, params: { locale } }) {
                                 shallowRouting
                                 appDirectory
                             />
+                            <SettingsModal searchParams={searchParams} />
                         </ThemeContextProvider>
                     </NextIntlClientProvider>
                 </SessionProvider>
