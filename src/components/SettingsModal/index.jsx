@@ -45,7 +45,7 @@ export default function SettingsModal() {
                     setOpenTab(tabIndex)
                 }}
             >
-                <div className="flex flex-row items-center leading-none gap-4 text-sm">
+                <div className="flex flex-row items-center leading-none gap-4">
                     {icon}
                     {title}
                 </div>
@@ -80,7 +80,7 @@ export default function SettingsModal() {
                             <div className={"flex flex-col bg-neutral-900 flex-1 sm:flex-none sm:w-60 h-full " + (openTab != undefined ? "hidden sm:flex" : "")}>
                                 <div className="text-2xl font-medium p-4 pb-6 leading-none flex flex-row items-center justify-between">
                                     {t("settings")}
-                                    <button className="p-1.5 -m-1.5 rounded-full hover:bg-neutral-800 transition" onClick={() => router.back()}>
+                                    <button className="p-1.5 -m-1.5 rounded-full hover:bg-neutral-800 transition sm:hidden" onClick={() => router.back()}>
                                         <XMarkIcon className="h-5 w-5 stroke-2" />
                                     </button>
                                 </div>
@@ -283,44 +283,44 @@ function ProfileTab({ goBack }) {
 
     return (
         <>
-            <div className="text-xl font-medium p-4 flex flex-row items-center gap-2">
+            <div className="text-xl leading-none mb-2 font-medium p-4 flex flex-row items-center gap-2">
                 <button className="p-1.5 -my-1.5 -ml-1.5 rounded-full hover:bg-neutral-800 transition block sm:hidden" onClick={() => goBack()}>
                     <ArrowLeftIcon className="h-5 w-5 stroke-2" />
                 </button>
                 {t("profile")}
             </div>
             <div className="flex-1 overflow-y-auto px-4 pb-4 flex flex-col gap-4">
-                <div className="text-sm flex flex-col gap-1">
+                <div className="flex flex-col gap-1">
                     <div className="flex flex-row items-center gap-1">
                         {t("username")}
-                        <span className="text-xs text-neutral-400">
+                        <span className="text-sm text-neutral-400">
                             &#8212;
                         </span>
                         {usernameAvailability === "available" && (
-                            <div className="text-green-400 text-xs">
+                            <div className="text-green-400 text-sm">
                                 {t("available")}
                             </div>
                         )}
                         {usernameAvailability === "unavailable" && (
-                            <div className="text-red-400 text-xs">
+                            <div className="text-red-400 text-sm">
                                 {t("unavailable")}
                             </div>
                         )}
                         {usernameAvailability === "loading" && (
-                            <div className="text-neutral-400 text-xs">
+                            <div className="text-neutral-400 text-sm">
                                 {t("loading")}...
                             </div>
                         )}
                         {usernameAvailability === "error" && (
-                            <div className="text-yellow-400 text-xs">{t("error")}</div>
+                            <div className="text-yellow-400 text-sm">{t("error")}</div>
                         )}
                         {usernameAvailability === "invalid" && (
-                            <div className="text-yellow-400 text-xs">
+                            <div className="text-yellow-400 text-sm">
                                 {t("invalid_username")}
                             </div>
                         )}
                         {usernameAvailability === "short" && (
-                            <div className="text-yellow-400 text-xs">
+                            <div className="text-yellow-400 text-sm">
                                 {t("username_too_short")}
                             </div>
                         )}
@@ -334,7 +334,7 @@ function ProfileTab({ goBack }) {
                         onInput={handleUsernameInputChange}
                     />
                 </div>
-                <div className="text-sm flex flex-col gap-1">
+                <div className="flex flex-col gap-1">
                     <div>{t("nickname")}</div>
                     <input
                         className="w-full outline-none rounded p-2 leading-none border border-neutral-800 bg-transparent placeholder:text-neutral-400 focus:ring-1 focus:ring-rose-400 transition"
@@ -344,7 +344,7 @@ function ProfileTab({ goBack }) {
                         ref={nicknameInputRef}
                     />
                 </div>
-                <div className="text-sm flex flex-col gap-1">
+                <div className="flex flex-col gap-1">
                     <div>{t("biography")}</div>
                     <textarea
                         className="w-full outline-none rounded p-2 leading-none border border-neutral-800 bg-transparent placeholder:text-neutral-400 focus:ring-1 focus:ring-rose-400 transition resize-y"
@@ -363,13 +363,13 @@ function ProfileTab({ goBack }) {
             </div>
             <div className="p-4 flex flex-row items-center justify-end gap-4">
                 <button
-                    className="rounded-full px-4 py-2 leading-none text-sm transition font-medium bg-neutral-800 hover:bg-neutral-700"
+                    className="rounded-full px-4 py-2 leading-none transition font-medium bg-neutral-800 hover:bg-neutral-700"
                     onClick={discardChanges}
                 >
                     {t("discard_changes")}
                 </button>
                 <button
-                    className="rounded-full px-4 py-2 leading-none text-sm transition font-medium bg-rose-400/20 hover:bg-rose-400/30 text-rose-400"
+                    className="rounded-full px-4 py-2 leading-none transition font-medium bg-rose-400/20 hover:bg-rose-400/30 text-rose-400"
                     onClick={saveChanges}
                 >
                     {t("save_changes")}
@@ -438,20 +438,20 @@ function AccountTab({ goBack }) {
 
     return (
         <>
-            <div className="text-xl font-medium p-4 flex flex-row items-center gap-2">
+            <div className="text-xl leading-none mb-2 font-medium p-4 flex flex-row items-center gap-2">
                 <button className="p-1.5 -my-1.5 -ml-1.5 rounded-full hover:bg-neutral-800 transition block sm:hidden" onClick={() => goBack()}>
                     <ArrowLeftIcon className="h-5 w-5 stroke-2" />
                 </button>
                 {t("account")}
             </div>
             <div className="flex-1 overflow-y-auto px-4 pb-4 flex flex-col gap-4">
-                <div className="text-sm flex flex-col gap-1">
+                <div className="flex flex-col gap-1">
                     <div className="flex flex-row items-center gap-1">
                         {t("email")}
-                        <span className="text-xs text-neutral-400">
+                        <span className="text-sm text-neutral-400">
                             &#8212;
                         </span>
-                        <div className="text-green-400 text-xs">
+                        <div className="text-green-400 text-sm">
                             {t("verified")}
                         </div>
                     </div>
@@ -462,7 +462,7 @@ function AccountTab({ goBack }) {
                         disabled
                     />
                 </div>
-                <div className="text-sm flex flex-col gap-1">
+                <div className="flex flex-col gap-1">
                     {t("password")}
                     <button className="w-fit bg-neutral-800 rounded px-4 py-2 leading-none opacity-50 cursor-not-allowed">{t("change_password")}</button>
                 </div>
@@ -476,7 +476,7 @@ function ApplicationsTab({ goBack }) {
 
     return (
         <>
-            <div className="text-xl font-medium p-4 flex flex-row items-center gap-2">
+            <div className="text-xl leading-none mb-2 font-medium p-4 flex flex-row items-center gap-2">
                 <button className="p-1.5 -my-1.5 -ml-1.5 rounded-full hover:bg-neutral-800 transition block sm:hidden" onClick={() => goBack()}>
                     <ArrowLeftIcon className="h-5 w-5 stroke-2" />
                 </button>
