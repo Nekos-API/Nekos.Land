@@ -80,7 +80,7 @@ export default function SettingsModal() {
                             <div className={"flex flex-col bg-neutral-900 flex-1 sm:flex-none sm:w-60 h-full " + (openTab != undefined ? "hidden sm:flex" : "")}>
                                 <div className="text-2xl font-medium p-4 pb-6 leading-none flex flex-row items-center justify-between">
                                     {t("settings")}
-                                    <button className="p-1.5 -m-1.5 rounded-full hover:bg-neutral-800 transition" onClick={() => router.back()}>
+                                    <button className="p-1.5 -m-1.5 rounded-full hover:bg-neutral-800 transition sm:hidden" onClick={() => router.back()}>
                                         <XMarkIcon className="h-5 w-5 stroke-2" />
                                     </button>
                                 </div>
