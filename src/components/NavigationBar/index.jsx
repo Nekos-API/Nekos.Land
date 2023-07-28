@@ -7,7 +7,7 @@ import { usePathname } from 'next-intl/client';
 import { useSession, signIn, signOut } from "next-auth/react";
 
 import { useTranslations } from 'next-intl';
-import { ChevronDownIcon, ArrowLeftOnRectangleIcon, ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon, HomeIcon, Squares2X2Icon, QuestionMarkCircleIcon, Cog6ToothIcon, BookmarkIcon } from "@heroicons/react/24/outline";
+import { ChevronDownIcon, ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon, HomeIcon, Squares2X2Icon, QuestionMarkCircleIcon, Cog6ToothIcon, BookmarkIcon } from "@heroicons/react/24/outline";
 
 import styles from "./styles.module.css";
 
@@ -54,10 +54,10 @@ export default function NavigationBar() {
                             opacity: isMobileNavOpen ? 1 : 0
                         }} />
                     </button>
-                    <div className="flex flex-row items-center gap-2">
+                    <Link href="/" className="flex flex-row items-center gap-2">
                         <div className="text-rose-400"><CatIcon className="h-8 w-8" /></div>
                         <div className="hidden sm:block font-medium text-2xl">Nekos.Land</div>
-                    </div>
+                    </Link>
                 </div>
                 <div className="flex-1 hidden md:flex flex-row items-center justify-center gap-8 whitespace-nowrap">
                     <Link href="/" className={styles.navLink + (pathname == "/" ? " " + styles.selected : "")}>{t("home")}</Link>

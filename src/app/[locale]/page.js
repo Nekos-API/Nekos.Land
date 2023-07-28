@@ -29,6 +29,7 @@ import { ThemeContext } from "@/contexts/ThemeContext";
 
 import CatIcon from "@/components/CatIcon";
 import Loading from "@/components/Loading";
+import { getNameFromURL } from "@/utils/urls";
 
 /**
  * Darkens a given hex color by a specified percentage.
@@ -222,12 +223,12 @@ export default function Home({ searchParams }) {
                 }),
             });
         } catch (e) {
-            console.error(res);
+            console.error(e);
             setIsImageLiked(!status);
             return;
         }
 
-        if (res.status < 200 && res.status >= 300) {
+        if (res.status < 200 || res.status >= 300) {
             setIsImageLiked(!status);
             console.error(res);
         }
@@ -257,12 +258,12 @@ export default function Home({ searchParams }) {
                 }),
             });
         } catch (e) {
-            console.error(res);
+            console.error(e);
             setIsImageSaved(!status);
             return;
         }
 
-        if (res.status < 200 && res.status >= 300) {
+        if (res.status < 200 || res.status >= 300) {
             setIsImageSaved(!status);
             console.error(res);
         }
@@ -605,46 +606,6 @@ function ImageDetails() {
 
     const artist = getArtist(data);
 
-    function getNameFromURL(url) {
-        // Get the domain name from the URL
-        const domain = new URL(url).hostname;
-
-        const names = {
-            "twitter.com": "Twitter",
-            "www.twitter.com": "Twitter",
-            "instagram.com": "Instagram",
-            "www.instagram.com": "Instagram",
-            "facebook.com": "Facebook",
-            "www.facebook.com": "Facebook",
-            "tiktok.com": "TikTok",
-            "www.tiktok.com": "TikTok",
-            "pinterest.com": "Pinterest",
-            "www.pinterest.com": "Pinterest",
-            "pixiv.net": "Pixiv",
-            "www.pixiv.net": "Pixiv",
-            "skeb.jp": "Skeb",
-            "www.skeb.jp": "Skeb",
-            "fanbox.cc": "Fanbox",
-            "www.fanbox.cc": "Fanbox",
-            "patreon.com": "Patreon",
-            "www.patreon.com": "Patreon",
-            "ko-fi.com": "Ko-fi",
-            "www.ko-fi.com": "Ko-fi",
-            "buymeacoffee.com": "Buymeacoffee",
-            "www.buymeacoffee.com": "Buymeacoffee",
-            "twitch.tv": "Twitch",
-            "www.twitch.tv": "Twitch",
-            "nekos.land": "Nekos.Land",
-            "www.nekos.land": "Nekos.Land",
-            "youtube.com": "YouTube",
-            "www.youtube.com": "YouTube",
-            "artstation.com": "ArtStation",
-            "www.artstation.com": "ArtStation",
-        };
-
-        return names[domain] || domain;
-    }
-
     async function toggleArtistFollow(status) {
         setIsArtistFollowed(status);
 
@@ -686,7 +647,7 @@ function ImageDetails() {
                 <div className="p-4 bg-neutral-900">
                     <div className="flex flex-row items-center gap-2">
                         <Link
-                            href={`/artist/${artist.id}`}
+                            href={`/artists/${artist.id}`}
                             className="flex flex-row items-center gap-2 hover:text-rose-200 transition-colors"
                         >
                             <img
