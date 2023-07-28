@@ -68,5 +68,12 @@
         "save_changes": "Guardar cambios",
         "saved_changes": "Cambios guardados",
         "wip": "Algunos nekos obreros ya estan trabajando en esto :)"
+    },
+    "Artist": {
+        "following": "Siguiendo",
+        "follow": "Seguir",
+        "followers": "Seguidores",
+        "images": "Imágenes",
+        "information": "Información"
     }
 }

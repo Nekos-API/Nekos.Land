@@ -68,5 +68,12 @@
         "save_changes": "Save changes",
         "saved_changes": "Changes saved",
         "wip": "Some construction nekos are already working on this :)"
+    },
+    "Artist": {
+        "following": "Following",
+        "follow": "Follow",
+        "followers": "Followers",
+        "images": "Images",
+        "information": "Information"
     }
 }

@@ -5,7 +5,6 @@ import React from "react";
 import Link from "next/link";
 
 import {
-    ArrowDownIcon,
     CheckIcon,
     EllipsisHorizontalIcon,
     GlobeAltIcon,
@@ -14,6 +13,8 @@ import {
     Squares2X2Icon,
 } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
+
+import { useTranslations } from "next-intl";
 
 import Loading from "@/components/Loading";
 import CatIcon from "@/components/CatIcon";
@@ -67,6 +68,8 @@ export default function Artist({ params }) {
     const [error, setError] = React.useState(false);
 
     const [isFollowing, setIsFollowing] = React.useState(false);
+
+    const t = useTranslations("Artist");
 
     const { data: session, status } = useSession();
 
@@ -170,14 +173,14 @@ export default function Artist({ params }) {
                                     {artist.relationships.followers.meta.count}
                                 </div>
                                 <div className="text-neutral-400">
-                                    Followers
+                                    {t("followers")}
                                 </div>
                             </div>
                             <div className="flex flex-row items-center gap-1">
                                 <div className="font-semibold">
                                     {artist.relationships.images.meta.count}
                                 </div>
-                                <div className="text-neutral-400">Artworks</div>
+                                <div className="text-neutral-400">{t("images")}</div>
                             </div>
                         </div>
                         <div className="rounded bg-neutral-900 flex flex-row items-center justify-center p-1 gap-2 w-fit">
@@ -205,7 +208,7 @@ export default function Artist({ params }) {
                                 >
                                     <CheckIcon className="h-5 w-5 stroke-2" />
                                     <span className="hidden md:block">
-                                        Following
+                                        {t("following")}
                                     </span>
                                 </button>
                             ) : (
@@ -219,14 +222,14 @@ export default function Artist({ params }) {
                                 >
                                     <PlusIcon className="h-5 w-5 stroke-2" />
                                     <span className="hidden md:block">
-                                        Follow
+                                        {t("follow")}
                                     </span>
                                 </button>
                             )
                         ) : (
                             <button className="bg-neutral-900 p-2 md:px-4 rounded-full leading-none transition-all flex flex-row items-center gap-2 opacity-50 cursor-not-allowed">
                                 <PlusIcon className="h-5 w-5 stroke-2" />
-                                <span className="hidden md:block">Follow</span>
+                                <span className="hidden md:block">{t("follow")}</span>
                             </button>
                         )}
                         <button className="font-bold bg-neutral-900 p-2 rounded-full leading-none hover:scale-90 transition-all">
@@ -237,11 +240,11 @@ export default function Artist({ params }) {
                 <div className="flex flex-row items-center justify-center w-full border-t border-t-neutral-800 mt-8 mb-6 text-sm">
                     <button className="flex flex-row items-center gap-2 px-4 py-2 leading-none border-t border-t-white -mt-px">
                         <Squares2X2Icon className="h-5 w-5 stroke-2" />
-                        <span>Artworks</span>
+                        <span>{t("images")}</span>
                     </button>
                     <button className="flex flex-row items-center gap-2 px-4 py-2 leading-none border-t border-t-transparent -mt-px text-neutral-400 cursor-not-allowed">
                         <InformationCircleIcon className="h-5 w-5 stroke-2" />
-                        <span>Information</span>
+                        <span>{t("information")}</span>
                     </button>
                 </div>
                 <ArtworkGrid artist={artist} />
