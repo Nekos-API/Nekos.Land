@@ -255,46 +255,44 @@ function ArtworkGrid({ artist }) {
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState(false);
 
-    const loadingRef = React.useRef();
+    const [page, setPage] = React.useState(1);
 
     const { data, status } = useSession();
 
-    function loadArtwork() {
-        if (!isLoading) {
-            setIsLoading(true);
-            fetch(`https://api.nekosapi.com/v2/artists/${artist.id}/images`, {
-                headers: {
-                    Authorization:
-                        status == "authenticated"
-                            ? `Bearer ${data.accessToken}`
-                            : undefined,
-                    Accept: "application/vnd.api+json",
-                },
-            })
-                .catch((exc) => {
-                    console.error(exc);
-                    setError(true);
-                    setIsLoading(false);
-                })
-                .then((res) => {
-                    if (res.status < 200 || res.status >= 300) {
-                        setError(true);
-                        setIsLoading(false);
-                    }
-                    return res.json();
-                })
-                .catch((exc) => {
-                    console.error(exc);
-                    setError(true);
-                    setIsLoading(false);
-                })
-                .then((images) => {
-                    if (!error) {
-                        setArtworks((v) => [...v, ...images.data]);
-                        setIsLoading(false);
-                    }
-                });
+    async function loadArtwork() {
+        setIsLoading(true);
+        try {
+            const res = await fetch(
+                `https://api.nekosapi.com/v2/images?filter[id.in]=${encodeURIComponent(
+                    artist.relationships.images.data
+                        .slice((page - 1) * 24, page * 24)
+                        .map((v, i) => v.id)
+                )}&page[limit]=24`,
+                {
+                    headers: {
+                        Authorization:
+                            status == "authenticated"
+                                ? `Bearer ${data.accessToken}`
+                                : undefined,
+                        Accept: "application/vnd.api+json",
+                    },
+                }
+            );
+
+            if (res.status < 200 || res.status >= 300) {
+                setError(true);
+                setIsLoading(false);
+                return;
+            }
+            const images = await res.json();
+
+            setArtworks((v) => [...v, ...images.data]);
+            setPage((v) => v + 1);
+        } catch (exc) {
+            console.error(exc);
+            setError(true);
         }
+        setIsLoading(false);
     }
 
     React.useEffect(() => {
@@ -305,31 +303,46 @@ function ArtworkGrid({ artist }) {
         <div className="flex flex-col items-center gap-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full relative">
                 {artworks.map((v, i) => {
-                    return <Artwork key={i} artwork={v} />;
+                    return (
+                        <Artwork
+                            key={i}
+                            artwork={v}
+                            isLast={i === artworks.length - 1}
+                            loadArtwork={loadArtwork}
+                        />
+                    );
                 })}
             </div>
-            {isLoading ? (
+            {isLoading && (
                 <div className="py-4">
-                    <Loading ref={loadingRef} />
+                    <Loading />
                 </div>
-            ) : artworks.length < artist.relationships.images.meta.count ? (
-                <button
-                    className="flex flex-row gap-2 py-2 px-4 items-center justify-center rounded-full bg-neutral-900 hover:scale-95 transition-all"
-                    onClick={() => {
-                        loadArtwork();
-                    }}
-                >
-                    <ArrowDownIcon className={`w-5 h-5`} />
-                    Load more
-                </button>
-            ) : null}
+            )}
         </div>
     );
 }
 
-function Artwork({ artwork }) {
+function Artwork({ artwork, isLast, loadArtwork }) {
+    const artworkRef = React.useRef();
+
+    React.useEffect(() => {
+        if (!artworkRef?.current) return;
+
+        const observer = new IntersectionObserver(([entry]) => {
+            if (isLast && entry.isIntersecting) {
+                loadArtwork();
+                observer.unobserve(entry.target);
+            }
+        });
+
+        observer.observe(artworkRef.current);
+    }, [isLast]);
+
     return (
-        <button className="w-full aspect-square rounded overflow-hidden bg-neutral-900 hover:opacity-90 transition">
+        <button
+            className="w-full aspect-square rounded overflow-hidden bg-neutral-900 hover:opacity-90 transition"
+            ref={artworkRef}
+        >
             <img
                 src={artwork.attributes.file}
                 loading="lazy"
