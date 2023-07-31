@@ -277,6 +277,9 @@ export default function Home({ searchParams }) {
 
     return (
         <main className="flex-1 flex flex-col relative">
+            {searchParams.image && (
+                <meta name="og:image" content={`https://api.nekosapi.com/v2/images/${searchParams.image}/file`} />
+            )}
             <ImageContext.Provider
                 value={{
                     data,
