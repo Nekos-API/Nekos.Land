@@ -61,6 +61,7 @@ export default async function RootLayout({
                     name="twitter:description"
                     content="Explore +23.2k adorable anime images in Nekos.Land, where charming meows and purrfection await! Join our Discord server for a meow-tastic community of anime enthusiasts. Embrace the kawaii wonders and unleash your love for anime!"
                 />
+                <meta name="twitter:card" content="summary_large_image"></meta>
 
                 <meta name="theme-color" content="#fb7185" />
                 <meta
