@@ -121,7 +121,7 @@ export default function Home({ searchParams }) {
 
     const t = useTranslations("Home");
 
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
 
     React.useEffect(() => {
         if (session?.error === "RefreshAccessTokenError") {
@@ -150,14 +150,14 @@ export default function Home({ searchParams }) {
         };
     }, []);
 
-    const refreshImage = () => {
+    const refreshImage = (imageID) => {
         setIsLoading(true);
         setIsImageLoading(true);
         setIsImageReported(false);
         setError(false);
 
         fetch(
-            `https://api.nekosapi.com/v2/images/random?filter[verificationStatus.in]=${encodeURIComponent(
+            `https://api.nekosapi.com/v2/images/${imageID ? imageID : "random"}?filter[verificationStatus.in]=${encodeURIComponent(
                 ["verified", "on_review", "not_reviewed"].join(",")
             )}&filter[ageRating.in]=${encodeURIComponent(
                 ageRatingIn.join(",")
@@ -270,8 +270,10 @@ export default function Home({ searchParams }) {
     }
 
     React.useEffect(() => {
-        refreshImage();
-    }, []);
+        if (status != "loading") {
+            refreshImage(searchParams.image);
+        }
+    }, [status]);
 
     return (
         <main className="flex-1 flex flex-col relative">
@@ -417,7 +419,7 @@ export default function Home({ searchParams }) {
                                     className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 hover:scale-90 transition-all"
                                     onClick={() => {
                                         navigator.clipboard.writeText(
-                                            data.data.attributes.file
+                                            "https://nekos.land" + window.location.pathname + "?image=" + data.data.id
                                         );
                                         alert(t("copied_image_url"));
                                     }}
