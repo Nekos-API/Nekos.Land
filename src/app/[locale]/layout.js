@@ -23,7 +23,11 @@ export function generateStaticParams() {
     return [{ locale: "en" }, { locale: "es" }];
 }
 
-export default async function RootLayout({ children, params: { locale }, searchParams }) {
+export default async function RootLayout({
+    children,
+    params: { locale },
+    searchParams,
+}) {
     let messages;
     try {
         messages = (await import(`../../messages/${locale}.json`)).default;
@@ -39,15 +43,30 @@ export default async function RootLayout({ children, params: { locale }, searchP
                     Meowsterpieces!
                 </title>
                 <meta property="og:type" content="website" />
+                <meta property="og:site_name" content="Nekos.Land" />
+                <meta
+                    property="og:title"
+                    content="Nekos.Land - UwU-nique Adventures with +23.2k Anime Image Meowsterpieces!"
+                />
                 <meta
                     name="og:description"
                     content="Explore +23.2k adorable anime images in Nekos.Land, where charming meows and purrfection await! Join our Discord server for a meow-tastic community of anime enthusiasts. Embrace the kawaii wonders and unleash your love for anime!"
+                />
+
+                <meta
+                    property="twitter:title"
+                    content="Nekos.Land - UwU-nique Adventures with +23.2k Anime Image Meowsterpieces!"
                 />
                 <meta
                     name="twitter:description"
                     content="Explore +23.2k adorable anime images in Nekos.Land, where charming meows and purrfection await! Join our Discord server for a meow-tastic community of anime enthusiasts. Embrace the kawaii wonders and unleash your love for anime!"
                 />
+
                 <meta name="theme-color" content="#fb7185" />
+                <meta
+                    name="description"
+                    content="Explore +23.2k adorable anime images in Nekos.Land, where charming meows and purrfection await! Join our Discord server for a meow-tastic community of anime enthusiasts. Embrace the kawaii wonders and unleash your love for anime!"
+                />
             </head>
             <body className={rubik.className}>
                 <SessionProvider>
