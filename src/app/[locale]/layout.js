@@ -9,34 +9,21 @@ import "./globals.css";
 
 import ProgressBar from "next-nprogress-bar";
 import { SessionProvider } from "next-auth/react";
-import { NextIntlClientProvider } from "next-intl";
 
 import { ThemeContextProvider } from "@/contexts/ThemeContext";
 import NavigationBar from "@/components/NavigationBar";
 import BackgroundGradient from "@/components/BackgroundGradient";
 import Footer from "@/components/Footer";
-import SettingsModal from "@/components/SettingsModal";
 
 const rubik = Rubik({ subsets: ["latin", "latin-ext"] });
 
-export function generateStaticParams() {
-    return [{ locale: "en" }, { locale: "es" }];
-}
-
-export default async function RootLayout({
-    children,
-    params: { locale },
-    searchParams,
-}) {
-    let messages;
-    try {
-        messages = (await import(`../../messages/${locale}.json`)).default;
-    } catch (error) {
+export default function RootLayout({ children, params, searchParams }) {
+    if (!["en", "es"].includes(params.locale)) {
         notFound();
     }
 
     return (
-        <html lang={locale}>
+        <html lang={params.locale}>
             <head>
                 <title>
                     Nekos.Land - UwU-nique Adventures with +23.2k Anime Image
@@ -71,22 +58,19 @@ export default async function RootLayout({
             </head>
             <body className={rubik.className}>
                 <SessionProvider>
-                    <NextIntlClientProvider locale={locale} messages={messages}>
-                        <ThemeContextProvider>
-                            <BackgroundGradient />
-                            <NavigationBar />
-                            {children}
-                            <Footer />
-                            <ProgressBar
-                                height="2px"
-                                color="#fb7185"
-                                options={{ showSpinner: false }}
-                                shallowRouting
-                                appDirectory
-                            />
-                            <SettingsModal searchParams={searchParams} />
-                        </ThemeContextProvider>
-                    </NextIntlClientProvider>
+                    <ThemeContextProvider>
+                        <BackgroundGradient />
+                        <NavigationBar />
+                        {children}
+                        <Footer />
+                        <ProgressBar
+                            height="2px"
+                            color="#fb7185"
+                            options={{ showSpinner: false }}
+                            shallowRouting
+                            appDirectory
+                        />
+                    </ThemeContextProvider>
                 </SessionProvider>
             </body>
         </html>

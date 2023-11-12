@@ -4,9 +4,8 @@ import React from "react";
 
 import Link from 'next-intl/link';
 import { usePathname } from 'next-intl/client';
-import { useSession, signIn, signOut } from "next-auth/react";
 
-import { useTranslations } from 'next-intl';
+import { useTranslations } from "@/messages";
 import { ChevronDownIcon, ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon, HomeIcon, Squares2X2Icon, QuestionMarkCircleIcon, Cog6ToothIcon, BookmarkIcon } from "@heroicons/react/24/outline";
 
 import styles from "./styles.module.css";
@@ -22,7 +21,6 @@ const NavbarContext = React.createContext({});
 export default function NavigationBar() {
     const pathname = usePathname();
 
-    const { data: session } = useSession();
     const t = useTranslations("NavigationBar");
     const [navBackground, setNavBackground] = React.useState("transparent");
 
@@ -65,7 +63,7 @@ export default function NavigationBar() {
                     <Link href="/about" className={styles.navLink}>{t("about")}</Link>
                 </div>
                 <div className="flex-1 flex flex-row gap-8 items-center justify-end">
-                    {session ? <ProfileButton /> : <LoginButton />}
+                    
                 </div>
             </div>
         </div>

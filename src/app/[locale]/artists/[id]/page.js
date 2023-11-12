@@ -12,7 +12,6 @@ import {
     PlusIcon,
     Squares2X2Icon,
 } from "@heroicons/react/24/outline";
-import { useSession } from "next-auth/react";
 
 import { useTranslations } from "next-intl";
 
@@ -72,41 +71,6 @@ export default function Artist({ params }) {
     const t = useTranslations("Artist");
 
     const { data: session, status } = useSession();
-
-    async function toggleArtistFollow(status) {
-        setIsFollowing(status);
-
-        let res;
-
-        try {
-            const url = `https://api.nekosapi.com/v2/users/${session.user.id}/relationships/followed-artists`;
-            res = await fetch(url, {
-                method: status ? "POST" : "DELETE",
-                headers: {
-                    "Content-Type": "application/vnd.api+json",
-                    Accept: "application/vnd.api+json",
-                    Authorization: `Bearer ${session.accessToken}`,
-                },
-                body: JSON.stringify({
-                    data: [
-                        {
-                            type: "artist",
-                            id: artist.id,
-                        },
-                    ],
-                }),
-            });
-        } catch (e) {
-            console.error(e);
-            setIsFollowing(!status);
-            return;
-        }
-
-        if (res.status < 200 || res.status >= 300) {
-            setIsFollowing(!status);
-            console.error(res);
-        }
-    }
 
     React.useEffect(() => {
         if (status != "loading") {

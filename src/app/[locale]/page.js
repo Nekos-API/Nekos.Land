@@ -5,23 +5,18 @@ import React from "react";
 import {
     ArrowPathIcon,
     ArrowsPointingOutIcon,
-    BookmarkIcon as BookmarkIconOutline,
     CheckIcon,
     ChevronUpIcon,
     FlagIcon,
-    HeartIcon as HeartIconOutline,
     LinkIcon,
     ShareIcon,
     XMarkIcon,
 } from "@heroicons/react/24/outline";
 import {
-    BookmarkIcon as BookmarkIconSolid,
     ExclamationTriangleIcon,
-    HeartIcon as HeartIconSolid,
 } from "@heroicons/react/24/solid";
 import { motion, AnimatePresence } from "framer-motion";
-import { useTranslations } from "next-intl";
-import { useSession, signIn } from "next-auth/react";
+import { useTranslations } from "@/messages";
 import { useRouter } from "next-intl/client";
 import Link from "next-intl/link";
 
@@ -71,6 +66,14 @@ function darkenHexColor(hexColor, percentage) {
     return `#${darkenedHex}`;
 }
 
+function rgbToHex(rgb) {
+    const r = rgb[0];
+    const g = rgb[1];
+    const b = rgb[2];
+
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
 const FiltersContext = React.createContext({
     ageRatingIn: [],
     setAgeRatingIn: (v) => {},
@@ -88,46 +91,20 @@ const FullScreenColorPaletteContext = React.createContext({
     setIsOpen: (v) => {},
 });
 
-function getArtist(data) {
-    if (data.included) {
-        for (const i of data.included) {
-            if (i.type === "artist") {
-                return i;
-            }
-        }
-    }
-    return;
-}
-
 export default function Home({ searchParams }) {
     const { setBgGradient } = React.useContext(ThemeContext);
-    const [ageRatingIn, setAgeRatingIn] = React.useState([
-        "sfw",
-        "questionable",
-    ]);
+    const [ageRatingIn, setAgeRatingIn] = React.useState(["safe", "suggestive"]);
+    const [isImageReported, setIsImageReported] = React.useState(false);
 
     const [data, setData] = React.useState({});
     const [isLoading, setIsLoading] = React.useState(true);
     const [isImageLoading, setIsImageLoading] = React.useState(true);
     const [error, setError] = React.useState(false);
 
-    const [isImageLiked, setIsImageLiked] = React.useState(false);
-    const [isImageSaved, setIsImageSaved] = React.useState(false);
-    const [isImageReported, setIsImageReported] = React.useState(false);
-    const [isArtistFollowed, setIsArtistFollowed] = React.useState(false);
-
     const [isFullScreenColorPaletteOpen, setIsFullScreenColorPaletteOpen] =
         React.useState(false);
 
     const t = useTranslations("Home");
-
-    const { data: session, status } = useSession();
-
-    React.useEffect(() => {
-        if (session?.error === "RefreshAccessTokenError") {
-            signIn("nekos-api"); // Force sign in to hopefully resolve error
-        }
-    }, [session]);
 
     React.useEffect(() => {
         const handleKeyDown = (event) => {
@@ -157,40 +134,23 @@ export default function Home({ searchParams }) {
         setError(false);
 
         fetch(
-            `https://api.nekosapi.com/v2/images/${imageID ? imageID : "random"}?filter[verificationStatus.in]=${encodeURIComponent(
-                ["verified", "on_review", "not_reviewed"].join(",")
-            )}&filter[ageRating.in]=${encodeURIComponent(
-                ageRatingIn.join(",")
-            )}`,
-            {
-                headers: {
-                    Accept: "application/vnd.api+json",
-                    Authorization: session
-                        ? `Bearer ${session.accessToken}`
-                        : undefined,
-                },
-            }
+            `https://api.nekosapi.com/v3/images/${
+                imageID ? imageID : "random"
+            }?${ageRatingIn
+                .map((v) => "rating=" + encodeURIComponent(v))
+                .join("&")}&limit=1`
         )
             .then((res) => res.json())
             .then((res) => {
-                setData(res);
+                const img = res.items[0];
+                setData(res.items[0]);
 
-                if (res.data.attributes.colors.dominant) {
+                if (img.color_dominant) {
                     setBgGradient(
-                        darkenHexColor(res.data.attributes.colors.dominant, 70)
+                        darkenHexColor(rgbToHex(img.color_dominant), 70)
                     );
                 } else {
                     setBgGradient("#4c0519");
-                }
-
-                setIsImageLiked(res.data.meta.user.liked);
-                setIsImageSaved(res.data.meta.user.saved);
-
-                const artist = getArtist(res);
-                if (artist) {
-                    setIsArtistFollowed(artist.meta.user.isFollowing);
-                } else {
-                    setIsArtistFollowed(false);
                 }
             })
             .catch(setError)
@@ -198,76 +158,6 @@ export default function Home({ searchParams }) {
                 setIsLoading(false);
             });
     };
-
-    async function toggleImageLike(status) {
-        setIsImageLiked(status);
-
-        let res;
-
-        try {
-            const url = `https://api.nekosapi.com/v2/users/${session.user.id}/relationships/liked-images`;
-            res = await fetch(url, {
-                method: status ? "POST" : "DELETE",
-                headers: {
-                    "Content-Type": "application/vnd.api+json",
-                    Accept: "application/vnd.api+json",
-                    Authorization: `Bearer ${session.accessToken}`,
-                },
-                body: JSON.stringify({
-                    data: [
-                        {
-                            type: "image",
-                            id: data.data.id,
-                        },
-                    ],
-                }),
-            });
-        } catch (e) {
-            console.error(e);
-            setIsImageLiked(!status);
-            return;
-        }
-
-        if (res.status < 200 || res.status >= 300) {
-            setIsImageLiked(!status);
-            console.error(res);
-        }
-    }
-
-    async function toggleImageSave(status) {
-        setIsImageSaved(status);
-
-        let res;
-
-        try {
-            const url = `https://api.nekosapi.com/v2/users/${session.user.id}/relationships/saved-images`;
-            res = await fetch(url, {
-                method: status ? "POST" : "DELETE",
-                headers: {
-                    "Content-Type": "application/vnd.api+json",
-                    Accept: "application/vnd.api+json",
-                    Authorization: `Bearer ${session.accessToken}`,
-                },
-                body: JSON.stringify({
-                    data: [
-                        {
-                            type: "image",
-                            id: data.data.id,
-                        },
-                    ],
-                }),
-            });
-        } catch (e) {
-            console.error(e);
-            setIsImageSaved(!status);
-            return;
-        }
-
-        if (res.status < 200 || res.status >= 300) {
-            setIsImageSaved(!status);
-            console.error(res);
-        }
-    }
 
     React.useEffect(() => {
         if (status != "loading") {
@@ -277,9 +167,12 @@ export default function Home({ searchParams }) {
 
     return (
         <main className="flex-1 flex flex-col relative">
-            {searchParams.image && (
-                <meta name="og:image" content={`https://api.nekosapi.com/v2/images/${searchParams.image}/file`} />
-            )}
+            {/* {searchParams.image && (
+                <meta
+                    name="og:image"
+                    content={`https://api.nekosapi.com/v2/images/${searchParams.image}/file`}
+                />
+            )} */}
             <ImageContext.Provider
                 value={{
                     data,
@@ -288,14 +181,6 @@ export default function Home({ searchParams }) {
                     setIsLoading,
                     error,
                     setError,
-                    isImageLiked,
-                    setIsImageLiked,
-                    isImageSaved,
-                    setIsImageSaved,
-                    isImageReported,
-                    setIsImageReported,
-                    isArtistFollowed,
-                    setIsArtistFollowed,
                 }}
             >
                 <FullScreenColorPaletteContext.Provider
@@ -336,7 +221,7 @@ export default function Home({ searchParams }) {
                                     <img
                                         src={
                                             !isLoading && !error
-                                                ? data.data.attributes.file
+                                                ? data.image_url
                                                 : null
                                         }
                                         className="w-full max-w-sm rounded object-cover object-center bg-neutral-900 transition-all duration-300"
@@ -360,43 +245,25 @@ export default function Home({ searchParams }) {
                                 <ImageDetailsPlaceholder />
                             )}
                             <div className="flex flex-row items-center justify-center gap-4 py-4 -my-4 w-full max-w-sm bg-black lg:sticky bottom-0">
-                                {session && !isLoading && !error ? (
-                                    <button
-                                        className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 hover:scale-90 transition-all"
-                                        onClick={() => {
-                                            toggleImageSave(!isImageSaved);
-                                        }}
-                                    >
-                                        {isImageSaved ? (
-                                            <BookmarkIconSolid className="w-5 h-5" />
-                                        ) : (
-                                            <BookmarkIconOutline className="w-5 h-5" />
-                                        )}
-                                    </button>
-                                ) : (
-                                    <button className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 transition-all cursor-not-allowed opacity-70">
-                                        <BookmarkIconOutline className="w-5 h-5" />
-                                    </button>
-                                )}
-                                {session && !isLoading && !error ? (
-                                    <button
-                                        className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 hover:scale-90 transition-all"
-                                        onClick={() => {
-                                            toggleImageLike(!isImageLiked);
-                                        }}
-                                    >
-                                        {isImageLiked ? (
-                                            <HeartIconSolid className="w-5 h-5" />
-                                        ) : (
-                                            <HeartIconOutline className="w-5 h-5" />
-                                        )}
-                                    </button>
-                                ) : (
+                                {!isLoading && !error && !isImageReported ? (
+                                    <Link href="?modal=report">
+                                        <button className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 hover:scale-90 transition-all">
+                                            <FlagIcon className="w-5 h-5" />
+                                        </button>
+                                    </Link>
+                                ) : !isImageReported ? (
                                     <button
                                         className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 transition-all cursor-not-allowed opacity-70"
                                         onClick={() => {}}
                                     >
-                                        <HeartIconOutline className="w-5 h-5" />
+                                        <FlagIcon className="w-5 h-5" />
+                                    </button>
+                                ) : (
+                                    <button
+                                        className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 transition-all cursor-not-allowed"
+                                        onClick={() => {}}
+                                    >
+                                        <CheckIcon className="w-5 h-5" />
                                     </button>
                                 )}
                                 <button
@@ -422,34 +289,16 @@ export default function Home({ searchParams }) {
                                     className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 hover:scale-90 transition-all"
                                     onClick={() => {
                                         navigator.clipboard.writeText(
-                                            "https://nekos.land" + window.location.pathname + "?image=" + data.data.id
+                                            "https://nekos.land" +
+                                                window.location.pathname +
+                                                "?image=" +
+                                                data.id
                                         );
                                         alert(t("copied_image_url"));
                                     }}
                                 >
                                     <ShareIcon className="w-5 h-5" />
                                 </button>
-                                {!isLoading && !error && !isImageReported ? (
-                                    <Link href="?modal=report">
-                                        <button className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 hover:scale-90 transition-all">
-                                            <FlagIcon className="w-5 h-5" />
-                                        </button>
-                                    </Link>
-                                ) : !isImageReported ? (
-                                    <button
-                                        className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 transition-all cursor-not-allowed opacity-70"
-                                        onClick={() => {}}
-                                    >
-                                        <FlagIcon className="w-5 h-5" />
-                                    </button>
-                                ) : (
-                                    <button
-                                        className="flex flex-row gap-2 p-2.5 items-center justify-center rounded-full bg-neutral-900 transition-all cursor-not-allowed"
-                                        onClick={() => {}}
-                                    >
-                                        <CheckIcon className="w-5 h-5" />
-                                    </button>
-                                )}
                             </div>
                         </div>
                         <div className="h-12 md:hidden"></div>
@@ -461,8 +310,8 @@ export default function Home({ searchParams }) {
             {!isLoading && !error && (
                 <ReportModal
                     searchParams={searchParams}
-                    imageID={data.data.id}
-                    verificationStatus={data.data.attributes.verificationStatus}
+                    imageID={data.id}
+                    verificationStatus={data.verification}
                     setIsImageReported={setIsImageReported}
                 />
             )}
@@ -552,8 +401,7 @@ function FiltersPanel() {
                                     {t("age_rating")}
                                 </span>
                                 {[
-                                    "sfw",
-                                    "questionable",
+                                    "safe",
                                     "suggestive",
                                     "borderline",
                                     "explicit",
@@ -607,94 +455,38 @@ function ImageDetails() {
     const { setIsOpen: setIsFullScreenColorPaletteOpen } = React.useContext(
         FullScreenColorPaletteContext
     );
-    const { data: session } = useSession();
 
-    const artist = getArtist(data);
-
-    async function toggleArtistFollow(status) {
-        setIsArtistFollowed(status);
-
-        let res;
-
-        try {
-            const url = `https://api.nekosapi.com/v2/users/${session.user.id}/relationships/followed-artists`;
-            res = await fetch(url, {
-                method: status ? "POST" : "DELETE",
-                headers: {
-                    "Content-Type": "application/vnd.api+json",
-                    Accept: "application/vnd.api+json",
-                    Authorization: `Bearer ${session.accessToken}`,
-                },
-                body: JSON.stringify({
-                    data: [
-                        {
-                            type: "artist",
-                            id: artist.id,
-                        },
-                    ],
-                }),
-            });
-        } catch (e) {
-            setIsArtistFollowed(!status);
-            console.error(res);
-            return;
-        }
-
-        if (res.status < 200 && res.status >= 300) {
-            setIsArtistFollowed(!status);
-            console.error(res);
-        }
-    }
+    var getLocation = function (href) {
+        var l = document.createElement("a");
+        l.href = href;
+        return l;
+    };
 
     return (
         <div className="rounded bg-neutral-800 w-full max-w-sm overflow-hidden flex flex-col gap-px">
-            {artist ? (
+            {data.artist ? (
                 <div className="p-4 bg-neutral-900">
                     <div className="flex flex-row items-center gap-2">
                         <Link
-                            href={`/artists/${artist.id}`}
+                            href={`/artists/${data.artist.id}`}
                             className="flex flex-row items-center gap-2 hover:text-rose-200 transition-colors"
                         >
                             <img
-                                src={artist.attributes.imageUrl}
+                                src={data.artist.image_url}
                                 className="h-6 w-6 rounded-full object-cover object-center"
                             />
                             <div className="font-medium leading-none">
-                                {artist.attributes.name}
+                                {data.artist.name}
                             </div>
                         </Link>
-                        {session ? (
-                            isArtistFollowed ? (
-                                <button
-                                    className="text-xs rounded-full border border-rose-400 py-0.5 px-2 leading-none transition-colors hover:bg-neutral-800"
-                                    onClick={() => toggleArtistFollow(false)}
-                                >
-                                    {t("unfollow")}
-                                </button>
-                            ) : (
-                                <button
-                                    className="text-xs rounded-full bg-neutral-700 py-0.5 px-2 leading-none transition-colors hover:bg-neutral-800"
-                                    onClick={() => toggleArtistFollow(true)}
-                                >
-                                    {t("follow")}
-                                </button>
-                            )
-                        ) : (
-                            <button className="text-xs rounded-full bg-neutral-700 py-0.5 px-2 leading-none transition-colors cursor-not-allowed opacity-70">
-                                {t("follow")}
-                            </button>
-                        )}
                     </div>
                     <div className="flex flex-row gap-1 text-sm leading-none mt-4">
                         <div className="text-rose-400 font-medium">
                             {t("aliases")}:
                         </div>
                         <div className="text-neutral-300">
-                            {artist.attributes.aliases.map((alias, index) => {
-                                if (
-                                    index !==
-                                    artist.attributes.aliases.length - 1
-                                ) {
+                            {data.artist.aliases.map((alias, index) => {
+                                if (index !== data.artist.aliases.length - 1) {
                                     return (
                                         <span key={index} className="ml-1">
                                             {alias},
@@ -715,20 +507,18 @@ function ImageDetails() {
                             {t("links")}:
                         </div>
                         <div className="text-neutral-300 flex flex-row items-center gap-1 flex-wrap">
-                            {artist.attributes.officialLinks.map(
-                                (link, index) => {
-                                    return (
-                                        <Link
-                                            className="ml-1 flex flex-row items-center gap-1 transition-colors hover:text-rose-200"
-                                            href={link}
-                                            target="_blank"
-                                        >
-                                            <LinkIcon className="h-3 w-3 stroke-2" />
-                                            {getNameFromURL(link)}
-                                        </Link>
-                                    );
-                                }
-                            )}
+                            {data.artist.links.map((link, index) => {
+                                return (
+                                    <Link
+                                        className="ml-1 flex flex-row items-center gap-1 transition-colors hover:text-rose-200"
+                                        href={link}
+                                        target="_blank"
+                                    >
+                                        <LinkIcon className="h-3 w-3 stroke-2" />
+                                        {getNameFromURL(link)}
+                                    </Link>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
@@ -743,15 +533,15 @@ function ImageDetails() {
                     <div className="text-rose-400 font-medium">
                         {t("image_source")}:
                     </div>
-                    {data.data.attributes.source.url ? (
+                    {data.source_url ? (
                         <div className="text-neutral-300">
                             <Link
                                 className="ml-1 flex flex-row items-center gap-1 transition-colors hover:text-rose-200"
                                 target="_blank"
-                                href={data.data.attributes.source.url}
+                                href={data.source_url}
                             >
                                 <LinkIcon className="h-3 w-3 stroke-2" />
-                                {data.data.attributes.source.name || "Unknown"}
+                                {getLocation(data.source_url).hostname}
                             </Link>
                         </div>
                     ) : (
@@ -762,9 +552,9 @@ function ImageDetails() {
                     <div className="text-rose-400 font-medium">
                         {t("age_rating")}:
                     </div>
-                    {data.data.attributes.ageRating ? (
+                    {data.rating ? (
                         <div className="text-neutral-300">
-                            <div>{t(data.data.attributes.ageRating)}</div>
+                            <div>{t(data.rating)}</div>
                         </div>
                     ) : (
                         <div className="text-neutral-400">
@@ -773,7 +563,7 @@ function ImageDetails() {
                     )}
                 </div>
             </div>
-            {data.data.attributes.colors.palette.length > 0 ? (
+            {data.color_palette.length > 0 ? (
                 <div className="p-4 bg-neutral-900 text-sm">
                     <div className="flex flex-row items-center justify-between">
                         <div className="text-rose-400 font-medium">
@@ -790,11 +580,12 @@ function ImageDetails() {
                         </button>
                     </div>
                     <div className="flex flex-row items-center h-4 rounded overflow-hidden mt-2">
-                        {data.data.attributes.colors.palette.map((color) => {
+                        {data.color_palette.map((color) => {
                             return (
                                 <div
                                     className="h-4 flex-1"
-                                    style={{ backgroundColor: color }}
+                                    style={{ backgroundColor: rgbToHex(color) }}
+                                    key={rgbToHex(color)}
                                 ></div>
                             );
                         })}
@@ -872,14 +663,16 @@ function FullScreenColorPalette() {
 
     return (
         <AnimatePresence>
-            {isOpen && data.data.attributes.colors.palette.length > 0 && (
+            {isOpen && data.color_palette.length > 0 && (
                 <div
                     className="hidden lg:block h-screen w-screen fixed top-0 bottom-0 left-0 right-0 z-50"
                     key="palette-container"
                 >
                     <div className="flex flex-row items-end h-full w-full">
-                        {data.data.attributes.colors.palette.map(
+                        {data.color_palette.map(
                             (color, index) => {
+                                color = rgbToHex(color);
+                                
                                 return (
                                     <motion.div
                                         key={index}
@@ -940,13 +733,13 @@ function ReportModal({
     verificationStatus,
     setIsImageReported,
 }) {
-    const session = useSession();
     const t = useTranslations("Home");
     const router = useRouter();
 
     const reportReasonRef = React.useRef();
 
-    const reportImage = async (e = null) => {
+    // Must add `async` to make it work
+    const reportImage = (e = null) => {
         if (e != null) {
             e.preventDefault();
         }
@@ -996,79 +789,84 @@ function ReportModal({
 
     return (
         <AnimatePresence>
-            {searchParams?.modal && searchParams.modal.split(",").includes("report") && (
-                <motion.div
-                    initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
-                    animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
-                    exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-                    transition={{ duration: 0.15 }}
-                    className="fixed top-0 left-0 right-0 bottom-0 z-50 bg-black/50 flex items-center justify-center"
-                >
-                    <div
-                        className="absolute top-0 bottom-0 left-0 right-0"
-                        onClick={() => router.back()}
-                    ></div>
+            {searchParams?.modal &&
+                searchParams.modal.split(",").includes("report") && (
                     <motion.div
-                        className="flex flex-col items-center justify-center gap-4 m-4"
-                        initial={{ scale: .95 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: .95 }}
-                        transition={{ duration: .15 }}
+                        initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+                        animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
+                        exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+                        transition={{ duration: 0.15 }}
+                        className="fixed top-0 left-0 right-0 bottom-0 z-50 bg-black/50 flex items-center justify-center"
                     >
-                        {verificationStatus != "verified" && (
-                            <div className="w-full max-w-md bg-black rounded relative mx-4">
-                                <div className="rounded w-full p-4 border border-yellow-400/50 bg-yellow-400/20 flex flex-row items-start gap-4 text-yellow-200">
-                                    <ExclamationTriangleIcon className="h-6 w-6 text-yellow-400 shrink-0" />
-                                    <div
-                                        dangerouslySetInnerHTML={{
-                                            __html:
-                                                verificationStatus ==
-                                                "on_review"
-                                                    ? t.raw("image_on_review")
-                                                    : t.raw(
-                                                          "image_not_reviewed"
-                                                      ),
-                                        }}
-                                    ></div>
-                                </div>
-                            </div>
-                        )}
-                        <form
-                            className="p-4 bg-neutral-900 rounded w-full max-w-md flex flex-col gap-4 z-10 mx-4"
-                            onSubmit={reportImage}
+                        <div
+                            className="absolute top-0 bottom-0 left-0 right-0"
+                            onClick={() => router.back()}
+                        ></div>
+                        <motion.div
+                            className="flex flex-col items-center justify-center gap-4 m-4"
+                            initial={{ scale: 0.95 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0.95 }}
+                            transition={{ duration: 0.15 }}
                         >
-                            <div className="font-medium text-xl">
-                                {t("report_this_image")}
-                            </div>
-                            <p className="leading-tight text-neutral-400">
-                                {t("image_report_description")}
-                            </p>
-                            <textarea
-                                className="rounded-lg bg-neutral-950 text-sm w-full resize-y p-2 outline-none text-neutral-300 transition focus:ring-1 focus:ring-rose-400 placeholder:text-neutral-400"
-                                placeholder={t("optional_image_report_reason")}
-                                ref={reportReasonRef}
-                                maxLength={200}
-                                rows={3}
-                            ></textarea>
-                            <div className="w-full flex flex-row gap-4 items-center mt-1">
-                                <button
-                                    className="p-2 rounded-lg leading-none font-medium flex-1 transition bg-neutral-800 hover:bg-neutral-700 text-neutral-300"
-                                    type="button"
-                                    onClick={() => router.back()}
-                                >
-                                    {t("cancel")}
-                                </button>
-                                <button
-                                    className="p-2 rounded-lg leading-none font-medium flex-1 transition bg-rose-400/10 hover:bg-rose-400/20 text-rose-400"
-                                    type="submit"
-                                >
-                                    {t("report")}
-                                </button>
-                            </div>
-                        </form>
+                            {verificationStatus != "verified" && (
+                                <div className="w-full max-w-md bg-black rounded relative mx-4">
+                                    <div className="rounded w-full p-4 border border-yellow-400/50 bg-yellow-400/20 flex flex-row items-start gap-4 text-yellow-200">
+                                        <ExclamationTriangleIcon className="h-6 w-6 text-yellow-400 shrink-0" />
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html:
+                                                    verificationStatus ==
+                                                    "on_review"
+                                                        ? t.raw(
+                                                              "image_on_review"
+                                                          )
+                                                        : t.raw(
+                                                              "image_not_reviewed"
+                                                          ),
+                                            }}
+                                        ></div>
+                                    </div>
+                                </div>
+                            )}
+                            <form
+                                className="p-4 bg-neutral-900 rounded w-full max-w-md flex flex-col gap-4 z-10 mx-4"
+                                onSubmit={reportImage}
+                            >
+                                <div className="font-medium text-xl">
+                                    {t("report_this_image")}
+                                </div>
+                                <p className="leading-tight text-neutral-400">
+                                    {t("image_report_description")}
+                                </p>
+                                <textarea
+                                    className="rounded-lg bg-neutral-950 text-sm w-full resize-y p-2 outline-none text-neutral-300 transition focus:ring-1 focus:ring-rose-400 placeholder:text-neutral-400"
+                                    placeholder={t(
+                                        "optional_image_report_reason"
+                                    )}
+                                    ref={reportReasonRef}
+                                    maxLength={200}
+                                    rows={3}
+                                ></textarea>
+                                <div className="w-full flex flex-row gap-4 items-center mt-1">
+                                    <button
+                                        className="p-2 rounded-lg leading-none font-medium flex-1 transition bg-neutral-800 hover:bg-neutral-700 text-neutral-300"
+                                        type="button"
+                                        onClick={() => router.back()}
+                                    >
+                                        {t("cancel")}
+                                    </button>
+                                    <button
+                                        className="p-2 rounded-lg leading-none font-medium flex-1 transition bg-rose-400/10 hover:bg-rose-400/20 text-rose-400"
+                                        type="submit"
+                                    >
+                                        {t("report")}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
                     </motion.div>
-                </motion.div>
-            )}
+                )}
         </AnimatePresence>
     );
 }

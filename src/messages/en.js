@@ -1,4 +1,4 @@
-{
+export default {
     "NavigationBar": {
         "home": "Home",
         "gallery": "Gallery",
@@ -17,7 +17,7 @@
         "copied_image_url": "Image URL copied to clipboard!",
         "filter": "Filter",
         "age_rating": "Age rating",
-        "sfw": "Safe for work",
+        "safe": "Safe for work",
         "questionable": "Questionable",
         "suggestive": "Suggestive",
         "borderline": "Borderline",

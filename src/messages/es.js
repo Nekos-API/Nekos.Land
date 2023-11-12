@@ -1,4 +1,4 @@
-{
+export default {
     "NavigationBar": {
         "home": "Inicio",
         "gallery": "Galería",
@@ -17,7 +17,7 @@
         "copied_image_url": "La URL de la imagen ha sido copiada en tu portapapeles!",
         "filter": "Filtrar",
         "age_rating": "Clasificación de Edad",
-        "sfw": "Apto para todo público",
+        "safe": "Apto para todo público",
         "questionable": "Cuestionable",
         "suggestive": "Sugestivo",
         "borderline": "Al límite",

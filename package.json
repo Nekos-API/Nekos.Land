@@ -14,7 +14,7 @@
     "eslint": "8.42.0",
     "eslint-config-next": "13.4.5",
     "framer-motion": "^10.12.16",
-    "next": "13.4.12",
+    "next": "14.0.2",
     "next-auth": "^4.22.1",
     "next-intl": "^2.15.1",
     "next-nprogress-bar": "^1.2.5",

@@ -472,7 +472,57 @@ function AccountTab({ goBack }) {
 }
 
 function ApplicationsTab({ goBack }) {
+    const session = useSession();
+
+    const [apps, setApps] = React.useState(null);
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [error, setError] = React.useState(null);
+
     const t = useTranslations("Settings");
+
+    // Load the user
+    React.useEffect(() => {
+        fetch(`https://api.nekosapi.com/v2/applications`, {
+            headers: {
+                Accept: "application/vnd.api+json",
+                Authorization: `Bearer ${session.data.accessToken}`,
+            },
+            cache: "no-cache"
+        })
+            .then((res) => {
+                if (res.ok) {
+                    res.json().then((json) => {
+                        setApps(json);
+                        setIsLoading(false);
+                    });
+                } else {
+                    setError(true);
+                    setIsLoading(false);
+                }
+            })
+            .catch((e) => {
+                setIsLoading(false);
+                setError(true);
+            });
+    }, []);
+
+    if (isLoading) {
+        return (
+            <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+                <CatIcon className="h-8 w-8 text-neutral-600" />
+                <Loading />
+            </div>
+        );
+    } else if (error) {
+        return (
+            <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+                <ExclamationCircleIcon className="h-8 w-8 text-rose-400" />
+                <div className="text-rose-400">
+                    {t("error")}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <>
