@@ -142,8 +142,8 @@ export default function Home({ searchParams }) {
         )
             .then((res) => res.json())
             .then((res) => {
-                const img = res.items[0];
-                setData(res.items[0]);
+                const img = res.items ? res.items[0] : res;
+                setData(img);
 
                 if (img.color_dominant) {
                     setBgGradient(
@@ -672,7 +672,7 @@ function FullScreenColorPalette() {
                         {data.color_palette.map(
                             (color, index) => {
                                 color = rgbToHex(color);
-                                
+
                                 return (
                                     <motion.div
                                         key={index}
