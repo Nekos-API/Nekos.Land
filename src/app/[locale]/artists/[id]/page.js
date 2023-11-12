@@ -5,15 +5,13 @@ import React from "react";
 import Link from "next/link";
 
 import {
-    CheckIcon,
     EllipsisHorizontalIcon,
     GlobeAltIcon,
     InformationCircleIcon,
-    PlusIcon,
     Squares2X2Icon,
 } from "@heroicons/react/24/outline";
 
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/messages";
 
 import Loading from "@/components/Loading";
 import CatIcon from "@/components/CatIcon";
@@ -66,23 +64,11 @@ export default function Artist({ params }) {
     const [isLoading, setIsLoading] = React.useState(true);
     const [error, setError] = React.useState(false);
 
-    const [isFollowing, setIsFollowing] = React.useState(false);
-
     const t = useTranslations("Artist");
-
-    const { data: session, status } = useSession();
 
     React.useEffect(() => {
         if (status != "loading") {
-            fetch(`https://api.nekosapi.com/v2/artists/${params.id}`, {
-                headers: {
-                    Authorization:
-                        status == "authenticated"
-                            ? `Bearer ${session.accessToken}`
-                            : undefined,
-                    Accept: "application/vnd.api+json",
-                },
-            })
+            fetch(`https://api.nekosapi.com/v3/artists/${params.id}`)
                 .catch((exc) => {
                     console.error(exc);
                     setError(true);
@@ -102,8 +88,7 @@ export default function Artist({ params }) {
                 })
                 .then((data) => {
                     if (!error) {
-                        setArtist(data.data);
-                        setIsFollowing(data.data.meta.user.isFollowing);
+                        setArtist(data);
                         setIsLoading(false);
                     }
                 });
@@ -124,31 +109,23 @@ export default function Artist({ params }) {
             <div className="flex flex-col w-full max-w-lg">
                 <div className="flex flex-row items-center gap-4">
                     <img
-                        src={artist.attributes.imageUrl}
+                        src={artist.image_url}
                         className="h-20 w-20 rounded-full bg-neutral-900"
                     />
                     <div className="flex-1 flex flex-col gap-2">
                         <div className="text-xl font-bold leading-none">
-                            {artist.attributes.name}
+                            {artist.name}
                         </div>
                         <div className="flex flex-row items-center gap-4 text-sm leading-none">
                             <div className="flex flex-row items-center gap-1">
                                 <div className="font-semibold">
-                                    {artist.relationships.followers.meta.count}
-                                </div>
-                                <div className="text-neutral-400">
-                                    {t("followers")}
-                                </div>
-                            </div>
-                            <div className="flex flex-row items-center gap-1">
-                                <div className="font-semibold">
-                                    {artist.relationships.images.meta.count}
+                                    N/A
                                 </div>
                                 <div className="text-neutral-400">{t("images")}</div>
                             </div>
                         </div>
                         <div className="rounded bg-neutral-900 flex flex-row items-center justify-center p-1 gap-2 w-fit">
-                            {artist.attributes.officialLinks.map((link, _) => {
+                            {artist.links.map((link, _) => {
                                 return (
                                     <Link href={link} target="_blank">
                                         {getIconFromLink(link, {
@@ -160,42 +137,6 @@ export default function Artist({ params }) {
                         </div>
                     </div>
                     <div className="flex flex-row items-center gap-2">
-                        {status == "authenticated" ? (
-                            isFollowing ? (
-                                <button
-                                    className="bg-neutral-900 p-2 md:px-4 rounded-full leading-none hover:scale-95 md:hover:scale-95 transition-all flex flex-row items-center gap-2"
-                                    onClick={() => {
-                                        toggleArtistFollow(!isFollowing).then(
-                                            () => {}
-                                        );
-                                    }}
-                                >
-                                    <CheckIcon className="h-5 w-5 stroke-2" />
-                                    <span className="hidden md:block">
-                                        {t("following")}
-                                    </span>
-                                </button>
-                            ) : (
-                                <button
-                                    className="bg-rose-400/20 text-rose-400 p-2 md:px-4 rounded-full leading-none hover:scale-90 md:hover:scale-95 transition-all flex flex-row items-center gap-2"
-                                    onClick={() => {
-                                        toggleArtistFollow(!isFollowing).then(
-                                            () => {}
-                                        );
-                                    }}
-                                >
-                                    <PlusIcon className="h-5 w-5 stroke-2" />
-                                    <span className="hidden md:block">
-                                        {t("follow")}
-                                    </span>
-                                </button>
-                            )
-                        ) : (
-                            <button className="bg-neutral-900 p-2 md:px-4 rounded-full leading-none transition-all flex flex-row items-center gap-2 opacity-50 cursor-not-allowed">
-                                <PlusIcon className="h-5 w-5 stroke-2" />
-                                <span className="hidden md:block">{t("follow")}</span>
-                            </button>
-                        )}
                         <button className="font-bold bg-neutral-900 p-2 rounded-full leading-none hover:scale-90 transition-all">
                             <EllipsisHorizontalIcon className="h-5 w-5 stroke-2" />
                         </button>
@@ -224,26 +165,16 @@ function ArtworkGrid({ artist }) {
 
     const [page, setPage] = React.useState(1);
 
-    const { data, status } = useSession();
-
     async function loadArtwork() {
+        if (isLoading) return;
         setIsLoading(true);
         try {
             const res = await fetch(
-                `https://api.nekosapi.com/v2/images?filter[id.in]=${encodeURIComponent(
-                    artist.relationships.images.data
-                        .slice((page - 1) * 24, page * 24)
-                        .map((v, i) => v.id)
-                )}&page[limit]=24`,
-                {
-                    headers: {
-                        Authorization:
-                            status == "authenticated"
-                                ? `Bearer ${data.accessToken}`
-                                : undefined,
-                        Accept: "application/vnd.api+json",
-                    },
-                }
+                `https://api.nekosapi.com/v3/images?artist=${encodeURIComponent(
+                    artist.id
+                )}&limit=24&offset=${
+                    (page - 1) * 24
+                }`,
             );
 
             if (res.status < 200 || res.status >= 300) {
@@ -253,7 +184,7 @@ function ArtworkGrid({ artist }) {
             }
             const images = await res.json();
 
-            setArtworks((v) => [...v, ...images.data]);
+            setArtworks((v) => [...v, ...images.items]);
             setPage((v) => v + 1);
         } catch (exc) {
             console.error(exc);
@@ -311,7 +242,7 @@ function Artwork({ artwork, isLast, loadArtwork }) {
             ref={artworkRef}
         >
             <img
-                src={artwork.attributes.file}
+                src={artwork.image_url}
                 loading="lazy"
                 className="object-cover object-center h-full w-full"
             />
