@@ -53,7 +53,7 @@ export const authOptions = {
             type: "oauth",
             version: "2.0",
             httpOptions: {
-                timeout: 10000,
+                timeout: 20000,
             },
             checks: ["pkce", "state", "nonce"],
             wellKnown:

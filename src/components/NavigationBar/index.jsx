@@ -4,10 +4,9 @@ import React from "react";
 
 import Link from 'next-intl/link';
 import { usePathname } from 'next-intl/client';
-import { useSession, signIn, signOut } from "next-auth/react";
 
-import { useTranslations } from 'next-intl';
-import { ChevronDownIcon, ArrowLeftOnRectangleIcon, ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon, HomeIcon, Squares2X2Icon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
+import { useTranslations } from "@/messages";
+import { ChevronDownIcon, ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon, HomeIcon, Squares2X2Icon, QuestionMarkCircleIcon, Cog6ToothIcon, BookmarkIcon } from "@heroicons/react/24/outline";
 
 import styles from "./styles.module.css";
 
@@ -22,7 +21,6 @@ const NavbarContext = React.createContext({});
 export default function NavigationBar() {
     const pathname = usePathname();
 
-    const { data: session } = useSession();
     const t = useTranslations("NavigationBar");
     const [navBackground, setNavBackground] = React.useState("transparent");
 
@@ -54,10 +52,10 @@ export default function NavigationBar() {
                             opacity: isMobileNavOpen ? 1 : 0
                         }} />
                     </button>
-                    <div className="flex flex-row items-center gap-2">
+                    <Link href="/" className="flex flex-row items-center gap-2">
                         <div className="text-rose-400"><CatIcon className="h-8 w-8" /></div>
                         <div className="hidden sm:block font-medium text-2xl">Nekos.Land</div>
-                    </div>
+                    </Link>
                 </div>
                 <div className="flex-1 hidden md:flex flex-row items-center justify-center gap-8 whitespace-nowrap">
                     <Link href="/" className={styles.navLink + (pathname == "/" ? " " + styles.selected : "")}>{t("home")}</Link>
@@ -65,7 +63,7 @@ export default function NavigationBar() {
                     <Link href="/about" className={styles.navLink}>{t("about")}</Link>
                 </div>
                 <div className="flex-1 flex flex-row gap-8 items-center justify-end">
-                    {session ? <ProfileButton /> : <LoginButton />}
+                    
                 </div>
             </div>
         </div>
@@ -132,11 +130,31 @@ function ProfileButton() {
                     duration: 0.15
                 }
             }} >
-            <div className={`relative rounded ${isMobileNavOpen ? "bg-neutral-800" : "bg-neutral-900"} py-2 leading-none whitespace-nowrap w-40 before:h-2.5 before:w-2.5 ${isMobileNavOpen ? "before:bg-neutral-800" : "before:bg-neutral-900"} before:absolute before:right-[0.825rem] before:-top-1 before:rotate-45 before:rounded-sm`}>
-                <button className="py-2 px-4 hover:bg-red-500 w-full flex flex-row items-center justify-start gap-2 transition-colors" onClick={() => { signOut() }}>
-                    <ArrowLeftOnRectangleIcon className="h-5 w-5" />
-                    {t("log_out")}
-                </button>
+            <div className={`relative rounded-md ${isMobileNavOpen ? "bg-neutral-700" : "bg-neutral-800"} leading-none whitespace-nowrap w-60 flex flex-col gap-px text-sm before:h-2.5 before:w-2.5 ${isMobileNavOpen ? "before:bg-neutral-800" : "before:bg-neutral-900"} before:absolute before:right-[0.825rem] before:-top-1 before:rotate-45 before:rounded-sm`}>
+                <div className={`py-2 ${isMobileNavOpen ? "bg-neutral-800" : "bg-neutral-900"} rounded-t-md`}>
+                    <button className="flex flex-row items-center justify-between hover:bg-neutral-800 transition py-2 px-4 w-full">
+                        <div className="flex flex-row items-center gap-2">
+                            <img src={session?.user?.avatarImage} className="h-5 w-5 rounded-full object-fit object-center bg-neutral-900" />
+                            <div>{t("profile")}</div>
+                        </div>
+                        <button className="rounded-md p-1 -m-1 hover:bg-red-400/10 transition" onClick={signOut}>
+                            <ArrowRightOnRectangleIcon className="h-5 w-5 stroke-2 text-red-400" />
+                        </button>
+                    </button>
+                </div>
+                <div className={`py-2 ${isMobileNavOpen ? "bg-neutral-800" : "bg-neutral-900"} text-neutral-200`}>
+                    <Link className="flex flex-row items-center gap-2 px-4 py-2 hover:bg-neutral-800 transition w-full" href="?modal=settings">
+                        <Cog6ToothIcon className="h-5 w-5 stroke-2" />
+                        {t("settings")}
+                    </Link>
+                    <button className="flex flex-row items-center gap-2 px-4 py-2 hover:bg-neutral-800 transition w-full">
+                        <BookmarkIcon className="h-5 w-5 stroke-2" />
+                        {t("library")}
+                    </button>
+                </div>
+                <div className={`py-2 px-4 ${isMobileNavOpen ? "bg-neutral-800" : "bg-neutral-900"} rounded-b-md text-neutral-400 text-xs`}>
+                    <Link href="https://nekosapi.com/">API Docs</Link>
+                </div>
             </div>
         </Popup >
     );
